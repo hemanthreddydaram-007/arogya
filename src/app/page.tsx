@@ -520,50 +520,94 @@ export default function HealthCopilotApp() {
       : new Date().toISOString().split("T")[0];
 
     try {
-      const { data: docData, error: docErr } = await supabase.from("documents").insert([{
-        user_id: sessionUser?.id || null,
+      // 1. Build document payload safely
+      const docPayload: any = {
         doc_type: extractedData.docType || "prescription",
         record_date: safeDate,
         doctor_name: extractedData.doctorName || "Attending Physician",
-        plain_summary: extractedData.plainSummary,
+        plain_summary: extractedData.plainSummary || "",
         technical_summary: extractedData.technicalSummary || "",
         questions: extractedData.questionsForDoctor || []
-      }]).select().single();
+      };
+      if (sessionUser?.id) {
+        docPayload.user_id = sessionUser.id;
+      }
+
+      let { data: docData, error: docErr } = await supabase
+        .from("documents")
+        .insert([docPayload])
+        .select()
+        .single();
+
+      // If user_id column doesn't exist yet in Supabase schema cache, retry without user_id
+      if (docErr && docErr.message?.includes("user_id")) {
+        delete docPayload.user_id;
+        const retry = await supabase
+          .from("documents")
+          .insert([docPayload])
+          .select()
+          .single();
+        docData = retry.data;
+        docErr = retry.error;
+      }
 
       if (docErr) throw docErr;
 
-      // Insert all extracted biomarkers
-      if (extractedData.biomarkers?.length > 0) {
-        const markerInserts = extractedData.biomarkers.map((b: any) => ({
-          document_id: docData.id,
-          user_id: sessionUser?.id || null,
-          marker_name: b.markerName,
-          value: b.value,
-          unit: b.unit || "",
-          status: b.status || "normal",
-          test_date: safeDate
-        }));
-        await supabase.from("biomarkers").insert(markerInserts);
+      // 2. Insert extracted biomarkers
+      if (extractedData.biomarkers?.length > 0 && docData?.id) {
+        const markerInserts = extractedData.biomarkers.map((b: any) => {
+          const item: any = {
+            document_id: docData.id,
+            marker_name: b.markerName,
+            value: b.value,
+            unit: b.unit || "",
+            status: b.status || "normal",
+            test_date: safeDate
+          };
+          if (sessionUser?.id) item.user_id = sessionUser.id;
+          return item;
+        });
+
+        const { error: bioErr } = await supabase.from("biomarkers").insert(markerInserts);
+        if (bioErr && bioErr.message?.includes("user_id")) {
+          const fallbackMarkers = markerInserts.map(({ user_id, ...rest }: any) => rest);
+          await supabase.from("biomarkers").insert(fallbackMarkers);
+        }
       }
 
-      // Insert all reconciled medications
+      // 3. Insert reconciled medications
       if (extractedData.medications?.length > 0) {
-        const medInserts = extractedData.medications.map((m: any) => ({
-          user_id: sessionUser?.id || null,
-          name: m.name,
-          dosage: m.dosage || "As advised",
-          frequency: m.frequency || "Daily",
-          duration: m.duration || "14 days",
-          status: m.actionType === "discontinued" ? "discontinued" : "active"
-        }));
-        await supabase.from("medications").insert(medInserts);
+        const medInserts = extractedData.medications.map((m: any) => {
+          const item: any = {
+            name: m.name,
+            dosage: m.dosage || "As advised",
+            frequency: m.frequency || "Daily",
+            duration: m.duration || "14 days",
+            status: m.actionType === "discontinued" ? "discontinued" : "active"
+          };
+          if (sessionUser?.id) item.user_id = sessionUser.id;
+          return item;
+        });
+
+        const { error: medErr } = await supabase.from("medications").insert(medInserts);
+        if (medErr && medErr.message?.includes("user_id")) {
+          const fallbackMeds = medInserts.map(({ user_id, ...rest }: any) => rest);
+          await supabase.from("medications").insert(fallbackMeds);
+        }
       }
 
-      await supabase.from("audit_logs").insert([{
-        user_id: sessionUser?.id || null,
+      // 4. Record audit log
+      const auditPayload: any = {
         action: "CLINICAL_DOCUMENT_SUMMARY_COMMITTED",
         resource: extractedData.docType || "prescription"
-      }]);
+      };
+      if (sessionUser?.id) auditPayload.user_id = sessionUser.id;
+      
+      const { error: auditErr } = await supabase.from("audit_logs").insert([auditPayload]);
+      if (auditErr && auditErr.message?.includes("user_id")) {
+        delete auditPayload.user_id;
+        await supabase.from("audit_logs").insert([auditPayload]);
+      }
 
       setShowConfirmModal(false);
       setExtractedData(null);

@@ -13,7 +13,7 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import { AbhaModal } from "@/components/AbhaModal";
 import { AuthModal } from "@/components/AuthModal";
 
-// Multilingual UI Dictionaries with Simple, Universal Names
+// Multilingual UI Dictionaries with Simple, Universal Terminology
 const TRANSLATIONS = {
   en: {
     appTitle: "HEALTH COPILOT",
@@ -539,7 +539,7 @@ export default function HealthCopilotApp() {
         .select()
         .single();
 
-      // If user_id column doesn't exist yet in Supabase schema cache, retry without user_id
+      // If user_id column causes schema issues, retry without it
       if (docErr && docErr.message?.includes("user_id")) {
         delete docPayload.user_id;
         const retry = await supabase
@@ -559,7 +559,7 @@ export default function HealthCopilotApp() {
           const item: any = {
             document_id: docData.id,
             marker_name: b.markerName,
-            value: b.value,
+            value: Number(b.value) || 0,
             unit: b.unit || "",
             status: b.status || "normal",
             test_date: safeDate
@@ -582,7 +582,7 @@ export default function HealthCopilotApp() {
             name: m.name,
             dosage: m.dosage || "As advised",
             frequency: m.frequency || "Daily",
-            duration: m.duration || "14 days",
+            duration: m.duration || "30 days",
             status: m.actionType === "discontinued" ? "discontinued" : "active"
           };
           if (sessionUser?.id) item.user_id = sessionUser.id;
@@ -611,7 +611,7 @@ export default function HealthCopilotApp() {
 
       setShowConfirmModal(false);
       setExtractedData(null);
-      fetchDashboardData();
+      await fetchDashboardData();
     } catch (err: any) {
       alert("Save error: " + err.message);
     }
@@ -940,7 +940,7 @@ export default function HealthCopilotApp() {
                 })}
               </div>
 
-              {/* ABDM Official NHA Banner Card (Matches Mobile Screenshot) */}
+              {/* ABDM Official NHA Banner Card */}
               <div 
                 onClick={() => setShowAbhaModal(true)}
                 className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950/20 via-[#0A101D] to-cyan-950/20 border border-emerald-500/30 hover:border-emerald-400/50 backdrop-blur-xl transition cursor-pointer flex items-center justify-between group shadow-[0_0_30px_rgba(16,185,129,0.06)]"

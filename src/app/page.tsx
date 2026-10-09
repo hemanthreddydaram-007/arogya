@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { 
   Activity, UploadCloud, Pill, Calendar, Clock, MessageSquare, 
   FileText, TrendingUp, ShieldCheck, CheckCircle2, Mic, MicOff, Printer,
-  RefreshCw, Send, Bell, BellRing, Volume2, VolumeX,
-  ChevronRight, Sparkles, Heart, Play, LogIn, LogOut, Building2
+  RefreshCw, Send, Bell, BellRing,
+  ChevronRight, Sparkles, Heart, LogIn, LogOut, Building2, Camera
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ConfirmModal } from "@/components/ConfirmModal";
@@ -22,7 +22,8 @@ const TRANSLATIONS = {
     abdmReady: "ABDM / FHIR READY",
     sirenTest: "Sound Test",
     ingesting: "Analyzing File...",
-    ingestBtn: "Upload Medical Record",
+    ingestBtn: "Upload Report",
+    cameraBtn: "Take Photo",
     signInUp: "Sign In / Up",
     signOut: "Sign Out",
     verifiedStatus: "VERIFIED",
@@ -33,6 +34,7 @@ const TRANSLATIONS = {
     abdmBannerTag: "GOVERNMENT OF INDIA",
     abdmBannerDesc: "An initiative by the Government of India to create a seamless, integrated digital healthcare ecosystem across the country. Connect your 14-digit ABHA ID or Aadhaar to securely sync records.",
     abdmConnectBtn: "Connect",
+    signInRequired: "Please sign in to upload reports or use the camera.",
     nav: {
       radar: "Health Overview",
       ledger: "Medical History",
@@ -53,7 +55,7 @@ const TRANSLATIONS = {
     },
     summariesTitle: "Recent Report Summaries",
     fullTimeline: "View Full History",
-    noDocs: "No medical records found. Click 'Upload Medical Record' above to scan a lab report or prescription.",
+    noDocs: "No medical records found. Click 'Upload Report' or 'Take Photo' above to scan a lab report or prescription.",
     dailyAlarms: "Medicine Reminders",
     armed: "ACTIVE",
     noReminders: "No reminders set. You can say 'Set a reminder for my medicine at 8:00 AM' in the AI Assistant.",
@@ -79,7 +81,7 @@ const TRANSLATIONS = {
     suggestedQuestions: "Important Questions for Your Doctor",
     agentTitle: "AI Health Assistant",
     chatPlaceholder: "Ask about your medicines, lab values, or set reminders...",
-    welcomeChat: "Hello! I am your AI Health Assistant. I can help explain your medical reports, check your medicines, or set daily reminders.",
+    welcomeChat: "Hello! How can I assist you with your health records or medications today?",
     formulating: "Checking your medical records..."
   },
   te: {
@@ -89,7 +91,8 @@ const TRANSLATIONS = {
     abdmReady: "ABDM / FHIR సిద్ధం",
     sirenTest: "శబ్దం పరీక్ష",
     ingesting: "విశ్లేషిస్తోంది...",
-    ingestBtn: "మెడికల్ రికార్డ్ అప్‌లోడ్",
+    ingestBtn: "రిపోర్ట్ అప్‌లోడ్",
+    cameraBtn: "ఫోటో తీయండి",
     signInUp: "లాగిన్ / రిజిస్టర్",
     signOut: "లాగ్ అవుట్",
     verifiedStatus: "ధృవీకరించబడింది",
@@ -100,6 +103,7 @@ const TRANSLATIONS = {
     abdmBannerTag: "భారత ప్రభుత్వం",
     abdmBannerDesc: "దేశవ్యాప్తంగా సురక్షిత డిజిటల్ ఆరోగ్య వ్యవస్థను రూపొందించడానికి భారత ప్రభుత్వ కార్యక్రమం. మీ రికార్డులను సమకాలీకరించడానికి 14 అంకెల ABHA నంబర్ లేదా ఆధార్‌ను అనుసంధానించండి.",
     abdmConnectBtn: "కనెక్ట్ చేయండి",
+    signInRequired: "మెడికల్ రికార్డులను అప్‌లోడ్ చేయడానికి లేదా కెమెరా వాడటానికి దయచేసి ముందుగా లాగిన్ అవ్వండి.",
     nav: {
       radar: "ఆరోగ్య అవలోకనం",
       ledger: "వైద్య చరిత్ర",
@@ -120,7 +124,7 @@ const TRANSLATIONS = {
     },
     summariesTitle: "ఇటీవలి నివేదికల సారాంశాలు",
     fullTimeline: "మొత్తం చరిత్ర చూడండి",
-    noDocs: "ఎటువంటి రికార్డులు లేవు. ప్రిస్క్రిప్షన్ లేదా ల్యాబ్ రిపోర్ట్ అప్‌లోడ్ చేయడానికి పైన ఉన్న బటన్ నొక్కండి.",
+    noDocs: "ఎటువంటి రికార్డులు లేవు. రిపోర్ట్ అప్‌లోడ్ చేయడానికి లేదా ఫోటో తీయడానికి పైన ఉన్న బటన్ నొక్కండి.",
     dailyAlarms: "మందుల రిమైండర్లు",
     armed: "సిద్ధం",
     noReminders: "రిమైండర్లు లేవు. చాట్‌లో 'ఉదయం 8 గంటలకు మందుల అలారం పెట్టు' అని చెప్పవచ్చు.",
@@ -146,7 +150,7 @@ const TRANSLATIONS = {
     suggestedQuestions: "డాక్టర్‌ని అడగవలసిన ముఖ్యమైన ప్రశ్నలు",
     agentTitle: "ఏఐ ఆరోగ్య సహాయకుడు",
     chatPlaceholder: "మందుల గురించి అడగండి లేదా అలారం సెట్ చేయండి...",
-    welcomeChat: "నమస్కారం! నేను మీ ఆరోగ్య సహాయకుడిని. మీ వైద్య నివేదికలను వివరించడంలో లేదా అలారాలు సెట్ చేయడంలో సహాయం చేయగలను.",
+    welcomeChat: "నమస్కారం! మీ ఆరోగ్య రికార్డులు లేదా మందుల గురించి నేను మీకు ఎలా సహాయపడగలను?",
     formulating: "సమాధానం సిద్ధం చేస్తోంది..."
   },
   hi: {
@@ -156,7 +160,8 @@ const TRANSLATIONS = {
     abdmReady: "ABDM / FHIR तैयार",
     sirenTest: "आवाज टेस्ट",
     ingesting: "प्रक्रिया जारी...",
-    ingestBtn: "मेडिकल रिकॉर्ड अपलोड करें",
+    ingestBtn: "रिपोर्ट अपलोड करें",
+    cameraBtn: "फोटो खींचें",
     signInUp: "साइन इन / रजिस्टर",
     signOut: "लॉग आउट",
     verifiedStatus: "सत्यापित",
@@ -167,6 +172,7 @@ const TRANSLATIONS = {
     abdmBannerTag: "भारत सरकार",
     abdmBannerDesc: "देश भर में एकीकृत डिजिटल स्वास्थ्य सेवा के लिए भारत सरकार की पहल। अपने मेडिकल रिकॉर्ड सुरक्षित रूप से सिंक करने के लिए अपना 14-अंकीय ABHA नंबर या आधार लिंक करें।",
     abdmConnectBtn: "कनेक्ट करें",
+    signInRequired: "मेडिकल रिकॉर्ड अपलोड करने या कैमरा इस्तेमाल करने के लिए कृपया पहले साइन इन करें।",
     nav: {
       radar: "स्वास्थ्य अवलोकन",
       ledger: "चिकित्सा इतिहास",
@@ -187,7 +193,7 @@ const TRANSLATIONS = {
     },
     summariesTitle: "रिपोर्ट का सारांश",
     fullTimeline: "पूरा इतिहास देखें",
-    noDocs: "कोई रिकॉर्ड उपलब्ध नहीं है। रिपोर्ट या पर्ची अपलोड करने के लिए ऊपर दिए गए बटन पर क्लिक करें।",
+    noDocs: "कोई रिकॉर्ड उपलब्ध नहीं है। रिपोर्ट अपलोड करने या फोटो लेने के लिए ऊपर दिए गए बटन पर क्लिक करें।",
     dailyAlarms: "दैनिक दवा अलार्म",
     armed: "सक्रिय",
     noReminders: "कोई अलार्म सक्रिय नहीं है। चैट में अलार्म सेट करने के लिए कहें।",
@@ -213,7 +219,7 @@ const TRANSLATIONS = {
     suggestedQuestions: "डॉक्टर से पूछे जाने वाले सवाल",
     agentTitle: "एआई स्वास्थ्य सहायक",
     chatPlaceholder: "दवाइयों के बारे में पूछें या अलार्म सेट करें...",
-    welcomeChat: "नमस्ते! मैं आपका एआई स्वास्थ्य सहायक हूँ। मैं आपकी रिपोर्ट समझाने या दवा का रिमाइंडर लगाने में मदद कर सकता हूँ।",
+    welcomeChat: "नमस्ते! आज मैं आपके स्वास्थ्य रिकॉर्ड या दवाओं के संबंध में आपकी क्या मदद कर सकता हूँ?",
     formulating: "उत्तर तैयार किया जा रहा है..."
   }
 };
@@ -253,10 +259,6 @@ export default function HealthCopilotApp() {
   const [activeAlarm, setActiveAlarm] = useState<any>(null);
   const triggeredAlarmsRef = useRef<Set<string>>(new Set());
 
-  // Text-To-Speech State
-  const [isPlayingSpeech, setIsPlayingSpeech] = useState(false);
-  const [currentlySpeakingText, setCurrentlySpeakingText] = useState("");
-
   // AI Copilot Agent State
   const [chatMessages, setChatMessages] = useState<{ role: "user" | "copilot"; text: string; action?: string }[]>([
     { 
@@ -270,6 +272,8 @@ export default function HealthCopilotApp() {
   const [selectedMarker, setSelectedMarker] = useState("Vitamin D");
 
   const recognitionRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (chatMessages.length === 1 && chatMessages[0].role === "copilot") {
@@ -301,9 +305,6 @@ export default function HealthCopilotApp() {
 
     return () => {
       subscription.unsubscribe();
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
     };
   }, []);
 
@@ -362,51 +363,6 @@ export default function HealthCopilotApp() {
     }
   };
 
-  const speakText = (text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      alert("Text-to-speech is not supported in this browser.");
-      return;
-    }
-
-    if (isPlayingSpeech && currentlySpeakingText === text) {
-      window.speechSynthesis.cancel();
-      setIsPlayingSpeech(false);
-      setCurrentlySpeakingText("");
-      return;
-    }
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-    utterance.lang = selectedLang === "te" ? "te-IN" : selectedLang === "hi" ? "hi-IN" : "en-US";
-
-    utterance.onstart = () => {
-      setIsPlayingSpeech(true);
-      setCurrentlySpeakingText(text);
-    };
-
-    utterance.onend = () => {
-      setIsPlayingSpeech(false);
-      setCurrentlySpeakingText("");
-    };
-
-    utterance.onerror = () => {
-      setIsPlayingSpeech(false);
-      setCurrentlySpeakingText("");
-    };
-
-    window.speechSynthesis.speak(utterance);
-  };
-
-  const stopAllSpeech = () => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      setIsPlayingSpeech(false);
-      setCurrentlySpeakingText("");
-    }
-  };
-
   useEffect(() => {
     const interval = setInterval(() => {
       if (!reminders || reminders.length === 0) return;
@@ -439,8 +395,6 @@ export default function HealthCopilotApp() {
           setActiveAlarm(r);
           playAlarmSound();
 
-          speakText(`Reminder: ${r.title} at ${r.time}`);
-
           if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
             new Notification(`Adherence Alert: ${r.title}`, {
               body: `Scheduled trigger time: ${r.time}.`,
@@ -452,7 +406,7 @@ export default function HealthCopilotApp() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [reminders, selectedLang]);
+  }, [reminders]);
 
   const fetchDashboardData = async () => {
     try {
@@ -476,9 +430,35 @@ export default function HealthCopilotApp() {
     setProfile(null);
   };
 
+  // Enforce Sign-in for File and Camera uploads
+  const handleUploadClick = () => {
+    if (!sessionUser) {
+      alert(t.signInRequired);
+      setShowAuthModal(true);
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handleCameraClick = () => {
+    if (!sessionUser) {
+      alert(t.signInRequired);
+      setShowAuthModal(true);
+      return;
+    }
+    cameraInputRef.current?.click();
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!sessionUser) {
+      alert(t.signInRequired);
+      setShowAuthModal(true);
+      e.target.value = "";
+      return;
+    }
 
     setUploading(true);
     const reader = new FileReader();
@@ -505,6 +485,8 @@ export default function HealthCopilotApp() {
         alert("Extraction failed: " + err.message);
       } finally {
         setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        if (cameraInputRef.current) cameraInputRef.current.value = "";
       }
     };
 
@@ -520,7 +502,6 @@ export default function HealthCopilotApp() {
       : new Date().toISOString().split("T")[0];
 
     try {
-      // 1. Build document payload safely
       const docPayload: any = {
         doc_type: extractedData.docType || "prescription",
         record_date: safeDate,
@@ -539,7 +520,6 @@ export default function HealthCopilotApp() {
         .select()
         .single();
 
-      // If user_id column causes schema issues, retry without it
       if (docErr && docErr.message?.includes("user_id")) {
         delete docPayload.user_id;
         const retry = await supabase
@@ -553,7 +533,6 @@ export default function HealthCopilotApp() {
 
       if (docErr) throw docErr;
 
-      // 2. Insert extracted biomarkers
       if (extractedData.biomarkers?.length > 0 && docData?.id) {
         const markerInserts = extractedData.biomarkers.map((b: any) => {
           const item: any = {
@@ -575,7 +554,6 @@ export default function HealthCopilotApp() {
         }
       }
 
-      // 3. Insert reconciled medications
       if (extractedData.medications?.length > 0) {
         const medInserts = extractedData.medications.map((m: any) => {
           const item: any = {
@@ -596,7 +574,6 @@ export default function HealthCopilotApp() {
         }
       }
 
-      // 4. Record audit log
       const auditPayload: any = {
         action: "CLINICAL_DOCUMENT_SUMMARY_COMMITTED",
         resource: extractedData.docType || "prescription"
@@ -641,7 +618,6 @@ export default function HealthCopilotApp() {
           ...prev, 
           { role: "copilot", text: data.reply, action: data.actionTaken }
         ]);
-        speakText(data.reply);
       }
 
       if (data.actionTaken) fetchDashboardData();
@@ -707,7 +683,6 @@ export default function HealthCopilotApp() {
     .filter(b => b.marker_name?.toLowerCase().includes(selectedMarker.toLowerCase()))
     .map(b => ({ date: b.test_date, value: Number(b.value) }));
 
-  // Everyday, intuitive labels for everyone
   const navItems = [
     { id: "overview", label: t.nav.radar, icon: Activity, badge: "Live" },
     { id: "timeline", label: t.nav.ledger, icon: Calendar, badge: `${documents.length}` },
@@ -719,11 +694,9 @@ export default function HealthCopilotApp() {
 
   return (
     <div className="min-h-screen bg-[#030712] text-neutral-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200 antialiased relative overflow-x-hidden pb-12">
-      {/* Background Radial Glows */}
       <div className="fixed top-[-20%] left-[20%] w-[800px] h-[500px] rounded-full bg-cyan-600/[0.07] blur-[160px] pointer-events-none" />
       <div className="fixed bottom-[-10%] right-[-5%] w-[700px] h-[600px] rounded-full bg-emerald-600/[0.05] blur-[180px] pointer-events-none" />
 
-      {/* Floating Alarm Pill */}
       {activeAlarm && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#0B0F1D]/90 backdrop-blur-2xl border border-amber-500/50 text-white px-6 py-3.5 rounded-full shadow-[0_0_50px_rgba(245,158,11,0.3)] flex items-center space-x-4 animate-in fade-in duration-300">
           <div className="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
@@ -741,21 +714,6 @@ export default function HealthCopilotApp() {
             className="bg-amber-500 hover:bg-amber-400 text-neutral-950 px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm cursor-pointer"
           >
             I took it
-          </button>
-        </div>
-      )}
-
-      {/* Floating Speech Playback Pill */}
-      {isPlayingSpeech && (
-        <div className="fixed top-6 right-8 z-50 bg-[#0B0F1D]/90 backdrop-blur-2xl border border-cyan-500/40 px-5 py-2.5 rounded-full shadow-[0_0_40px_rgba(6,182,212,0.25)] flex items-center space-x-3.5">
-          <div className="flex items-center space-x-1">
-            <span className="w-1 h-3 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-            <span className="w-1 h-5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-            <span className="w-1 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-          </div>
-          <span className="text-xs font-medium text-cyan-300 font-mono truncate max-w-[200px]">Reading Aloud...</span>
-          <button onClick={stopAllSpeech} className="text-neutral-400 hover:text-white transition cursor-pointer">
-            <VolumeX className="w-4 h-4" />
           </button>
         </div>
       )}
@@ -821,19 +779,53 @@ export default function HealthCopilotApp() {
             onClick={playAlarmSound}
             className="flex items-center space-x-1.5 text-xs text-neutral-300 bg-white/[0.03] hover:bg-white/[0.08] px-3.5 py-2 rounded-xl border border-white/[0.08] transition cursor-pointer"
           >
-            <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
+            <Bell className="w-3.5 h-3.5 text-cyan-400" />
             <span className="font-mono text-[11px]">{t.sirenTest}</span>
           </button>
 
-          <label className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-neutral-950 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer transition shadow-[0_0_25px_rgba(6,182,212,0.3)]">
+          {/* 1. Camera Snap Button */}
+          <button
+            type="button"
+            onClick={handleCameraClick}
+            disabled={uploading}
+            className="flex items-center space-x-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold px-3 py-2 rounded-xl text-xs cursor-pointer transition disabled:opacity-50"
+            title="Take a photo with your device camera"
+          >
+            <Camera className="w-4 h-4" />
+            <span>{uploading ? "..." : t.cameraBtn}</span>
+          </button>
+          <input 
+            ref={cameraInputRef}
+            type="file" 
+            accept="image/*" 
+            capture="environment"
+            onChange={handleFileUpload} 
+            disabled={uploading} 
+            className="hidden" 
+          />
+
+          {/* 2. File / PDF Upload Button */}
+          <button
+            type="button"
+            onClick={handleUploadClick}
+            disabled={uploading}
+            className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-neutral-950 font-bold px-3.5 py-2 rounded-xl text-xs cursor-pointer transition shadow-[0_0_25px_rgba(6,182,212,0.3)] disabled:opacity-50"
+          >
             <UploadCloud className="w-4 h-4" />
             <span>{uploading ? t.ingesting : t.ingestBtn}</span>
-            <input type="file" accept="*/*" onChange={handleFileUpload} disabled={uploading} className="hidden" />
-          </label>
+          </button>
+          <input 
+            ref={fileInputRef}
+            type="file" 
+            accept="*/*" 
+            onChange={handleFileUpload} 
+            disabled={uploading} 
+            className="hidden" 
+          />
 
           <div className="h-6 w-px bg-white/[0.08] mx-1" />
 
-          {/* Auth Capsule */}
+          {/* User Auth Capsule */}
           {sessionUser ? (
             <div className="flex items-center space-x-3 bg-white/[0.03] border border-white/[0.08] px-3.5 py-1.5 rounded-xl backdrop-blur-md">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center text-xs font-bold text-cyan-300">
@@ -869,7 +861,7 @@ export default function HealthCopilotApp() {
 
       {/* Main Workspace Frame */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Navigation Rail with Simple Universal Labels */}
+        {/* Navigation Rail */}
         <aside className="w-68 border-r border-white/[0.06] bg-[#070B16]/50 p-4 flex flex-col justify-between">
           <nav className="space-y-1.5">
             <div className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 px-3 mb-2 font-bold">{t.menuHeader}</div>
@@ -1000,20 +992,11 @@ export default function HealthCopilotApp() {
                                 {doc.record_date}
                               </span>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              {doc.doctor_name && (
-                                <span className="text-neutral-400 font-mono text-[11px] truncate max-w-[150px]">
-                                  {doc.doctor_name}
-                                </span>
-                              )}
-                              <button
-                                onClick={() => speakText(doc.plain_summary)}
-                                title="Listen"
-                                className="p-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 transition cursor-pointer"
-                              >
-                                <Play className="w-3 h-3" />
-                              </button>
-                            </div>
+                            {doc.doctor_name && (
+                              <span className="text-neutral-400 font-mono text-[11px] truncate max-w-[150px]">
+                                {doc.doctor_name}
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-neutral-200 leading-relaxed font-sans">
                             {doc.plain_summary}
@@ -1092,16 +1075,7 @@ export default function HealthCopilotApp() {
                         <span className="text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                           {doc.doc_type}
                         </span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-neutral-400 font-mono text-[11px]">{doc.record_date}</span>
-                          <button
-                            onClick={() => speakText(doc.plain_summary)}
-                            title="Listen"
-                            className="p-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 transition cursor-pointer"
-                          >
-                            <Play className="w-3 h-3" />
-                          </button>
-                        </div>
+                        <span className="text-neutral-400 font-mono text-[11px]">{doc.record_date}</span>
                       </div>
                       <h4 className="font-bold text-sm text-white">{doc.doctor_name || "Diagnostic Finding"}</h4>
                       <p className="text-xs text-neutral-300 leading-relaxed font-sans">{doc.plain_summary}</p>
@@ -1199,19 +1173,10 @@ export default function HealthCopilotApp() {
                   <h2 className="text-2xl font-extrabold text-white tracking-tight">{t.dossierHeader}</h2>
                   <p className="text-xs text-neutral-400 mt-1">{t.dossierSub}</p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button 
-                    onClick={() => speakText(`Patient: ${profile?.name || "Patient"}. Regimen: ${medications.map(m => `${m.name},${m.dosage}`).join(", ")}.`)}
-                    className="p-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 transition cursor-pointer"
-                    title="Read Aloud"
-                  >
-                    <Volume2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => window.print()} className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
-                    <Printer className="w-4 h-4 text-cyan-400" />
-                    <span>{t.printBrief}</span>
-                  </button>
-                </div>
+                <button onClick={() => window.print()} className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+                  <Printer className="w-4 h-4 text-cyan-400" />
+                  <span>{t.printBrief}</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-2 gap-4 bg-white/[0.02] border border-white/[0.05] p-4 rounded-2xl text-xs font-sans">
@@ -1241,7 +1206,7 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 6: AI HEALTH ASSISTANT */}
+          {/* TAB 6: AI HEALTH ASSISTANT (Chat without voice audio or speech buttons) */}
           {activeTab === "chat" && (
             <div className="max-w-3xl mx-auto h-[calc(100vh-160px)] flex flex-col rounded-3xl bg-[#0A0E1A]/80 border border-white/[0.08] overflow-hidden backdrop-blur-xl shadow-2xl">
               <div className="p-4 border-b border-white/[0.06] flex items-center justify-between bg-white/[0.02]">
@@ -1268,15 +1233,6 @@ export default function HealthCopilotApp() {
                         </div>
                       )}
                       <div className="whitespace-pre-wrap">{msg.text}</div>
-                      {msg.role === "copilot" && (
-                        <button
-                          onClick={() => speakText(msg.text)}
-                          className="mt-2 text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center space-x-1 cursor-pointer font-mono"
-                        >
-                          <Volume2 className="w-3.5 h-3.5" />
-                          <span>Listen</span>
-                        </button>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -1327,7 +1283,6 @@ export default function HealthCopilotApp() {
         onConfirm={handleConfirmSave}
       />
 
-      {/* ABDM & FHIR Resource Modal */}
       <AbhaModal
         isOpen={showAbhaModal}
         onClose={() => setShowAbhaModal(false)}
@@ -1336,7 +1291,6 @@ export default function HealthCopilotApp() {
         medications={medications}
       />
 
-      {/* Authentication Modal */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}

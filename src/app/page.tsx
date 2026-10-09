@@ -6,29 +6,32 @@ import {
   Activity, UploadCloud, Pill, Calendar, Clock, MessageSquare, 
   FileText, TrendingUp, ShieldCheck, CheckCircle2, Mic, MicOff, Printer,
   RefreshCw, Send, Bell, BellRing, Volume2, VolumeX,
-  ChevronRight, Sparkles, Heart, Play
+  ChevronRight, Sparkles, Heart, Play, LogIn, LogOut
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { AbhaModal } from "@/components/AbhaModal";
+import { AuthModal } from "@/components/AuthModal";
 
 export default function HealthCopilotApp() {
   const [activeTab, setActiveTab] = useState<"overview" | "timeline" | "medications" | "trends" | "chat" | "doctor-prep">("overview");
 
-  // Multi-Language & ABDM States (Challenge Brief Bonus Features)
+  // Multi-Language & ABDM States
   const [selectedLang, setSelectedLang] = useState<"en" | "te" | "hi">("en");
   const [showAbhaModal, setShowAbhaModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Default Local Patient Profile (No Google Login Required)
-  const [profile, setProfile] = useState<any>({
-    name: "Attending Patient",
-    blood_group: "O+",
-    age: 28,
-    gender: "Not Specified",
-    allergies: ["None documented"]
-  });
+  // Authenticated User State (Loaded strictly from Supabase session)
+  const [sessionUser, setSessionUser] = useState<any>(null);
+  const [profile, setProfile] = useState<{
+    name: string;
+    blood_group: string;
+    age: number | string;
+    gender: string;
+    allergies: string[];
+  } | null>(null);
 
-  // Clinical Records State
+  // Clinical Records State (Dynamically populated from database)
   const [documents, setDocuments] = useState<any[]>([]);
   const [medications, setMedications] = useState<any[]>([]);
   const [reminders, setReminders] = useState<any[]>([]);
@@ -39,7 +42,7 @@ export default function HealthCopilotApp() {
   const [extractedData, setExtractedData] = useState<any>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // Emergency / Adherence Alarm State
+  // Adherence Alarm State
   const [activeAlarm, setActiveAlarm] = useState<any>(null);
   const triggeredAlarmsRef = useRef<Set<string>>(new Set());
 
@@ -51,7 +54,7 @@ export default function HealthCopilotApp() {
   const [chatMessages, setChatMessages] = useState<{ role: "user" | "copilot"; text: string; action?: string }[]>([
     { 
       role: "copilot", 
-      text: "Health Copilot online. All clinical records, prescriptions, and lab panels are verified. How can I assist your healthcare journey today?" 
+      text: "Health Copilot online. Telemetry pipeline connected. How can I assist with your health records today?" 
     }
   ]);
   const [inputPrompt, setInputPrompt] = useState("");
@@ -62,15 +65,56 @@ export default function HealthCopilotApp() {
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    fetchDashboardData();
+    // 1. Initial Session Check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setSessionUser(session.user);
+        loadUserProfile(session.user);
+      }
+      fetchDashboardData();
+    });
+
+    // 2. Auth State Change Listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setSessionUser(session.user);
+        loadUserProfile(session.user);
+      } else {
+        setSessionUser(null);
+        setProfile(null);
+      }
+      fetchDashboardData();
+    });
+
     requestNotificationPermission();
 
     return () => {
+      subscription.unsubscribe();
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
     };
   }, []);
+
+  const loadUserProfile = async (user: any) => {
+    try {
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      if (data) {
+        setProfile(data);
+      } else {
+        // Build dynamic profile from Supabase user_metadata
+        setProfile({
+          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Active Patient",
+          blood_group: user.user_metadata?.blood_group || "O+",
+          age: user.user_metadata?.age || "--",
+          gender: "Not Specified",
+          allergies: []
+        });
+      }
+    } catch (e) {
+      console.error("Error loading user profile:", e);
+    }
+  };
 
   const requestNotificationPermission = async () => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -202,12 +246,6 @@ export default function HealthCopilotApp() {
 
   const fetchDashboardData = async () => {
     try {
-      // Load saved profile if present in Supabase, else use default
-      const { data: profData } = await supabase.from("profiles").select("*").limit(1).maybeSingle();
-      if (profData) {
-        setProfile(profData);
-      }
-
       const { data: docs } = await supabase.from("documents").select("*").order("record_date", { ascending: false });
       const { data: meds } = await supabase.from("medications").select("*");
       const { data: rems } = await supabase.from("reminders").select("*").order("time", { ascending: true });
@@ -220,6 +258,12 @@ export default function HealthCopilotApp() {
     } catch (err) {
       console.error("Telemetry load error:", err);
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setSessionUser(null);
+    setProfile(null);
   };
 
   // Ingestion with multi-lingual support
@@ -268,6 +312,7 @@ export default function HealthCopilotApp() {
 
     try {
       const { data: docData, error: docErr } = await supabase.from("documents").insert([{
+        user_id: sessionUser?.id || null,
         doc_type: extractedData.docType || "prescription",
         record_date: safeDate,
         doctor_name: extractedData.doctorName || "Attending Physician",
@@ -281,6 +326,7 @@ export default function HealthCopilotApp() {
       if (extractedData.biomarkers?.length > 0) {
         const markerInserts = extractedData.biomarkers.map((b: any) => ({
           document_id: docData.id,
+          user_id: sessionUser?.id || null,
           marker_name: b.markerName,
           value: b.value,
           unit: b.unit,
@@ -292,6 +338,7 @@ export default function HealthCopilotApp() {
 
       if (extractedData.medications?.length > 0) {
         const medInserts = extractedData.medications.map((m: any) => ({
+          user_id: sessionUser?.id || null,
           name: m.name,
           dosage: m.dosage,
           frequency: m.frequency,
@@ -302,6 +349,7 @@ export default function HealthCopilotApp() {
       }
 
       await supabase.from("audit_logs").insert([{
+        user_id: sessionUser?.id || null,
         action: "RECORD_INGESTION_AURA",
         resource: extractedData.docType || "prescription"
       }]);
@@ -387,16 +435,10 @@ export default function HealthCopilotApp() {
         if (transcript.trim()) setInputPrompt(transcript);
       };
 
-      recognition.onerror = (event: any) => {
-        setIsListening(false);
-        if (event.error === "network") {
-          alert("Microphone network error: Google Speech Services was blocked by browser shields. Open localhost:3000 in Microsoft Edge or Google Chrome.");
-        }
-      };
-
+      recognition.onerror = () => setIsListening(false);
       recognition.onend = () => setIsListening(false);
       recognition.start();
-    } catch (err: any) {
+    } catch {
       setIsListening(false);
     }
   };
@@ -462,7 +504,7 @@ export default function HealthCopilotApp() {
         </div>
       )}
 
-      {/* Main Header with Language Switcher and ABHA/FHIR Trigger */}
+      {/* Header Bar */}
       <header className="h-18 px-8 border-b border-white/[0.07] bg-[#070B16]/80 backdrop-blur-2xl flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center space-x-4">
           <div className="relative">
@@ -488,7 +530,7 @@ export default function HealthCopilotApp() {
         </div>
 
         <div className="flex items-center space-x-3">
-          {/* Multi-Language Selector (Bonus Credit) */}
+          {/* Multi-Language Selector */}
           <div className="flex bg-white/[0.04] border border-white/[0.08] rounded-xl p-0.5 text-xs font-mono">
             <button 
               onClick={() => setSelectedLang("en")} 
@@ -510,7 +552,7 @@ export default function HealthCopilotApp() {
             </button>
           </div>
 
-          {/* ABDM / ABHA Modal Trigger Button (Bonus Credit) */}
+          {/* ABDM Modal Trigger */}
           <button
             onClick={() => setShowAbhaModal(true)}
             className="flex items-center space-x-1.5 text-xs font-mono text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 px-3 py-1.5 rounded-xl transition cursor-pointer"
@@ -529,22 +571,43 @@ export default function HealthCopilotApp() {
 
           <label className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-neutral-950 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer transition shadow-[0_0_25px_rgba(6,182,212,0.3)]">
             <UploadCloud className="w-4 h-4" />
-            <span>{uploading ? "Ingesting Telemetry..." : "Ingest Health Record"}</span>
+            <span>{uploading ? "Ingesting..." : "Ingest Health Record"}</span>
             <input type="file" accept="*/*" onChange={handleFileUpload} disabled={uploading} className="hidden" />
           </label>
 
           <div className="h-6 w-px bg-white/[0.08] mx-1" />
 
-          {/* Profile Card (Always Active) */}
-          <div className="flex items-center space-x-3 bg-white/[0.03] border border-white/[0.08] px-3.5 py-1.5 rounded-xl backdrop-blur-md">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center text-xs font-bold text-cyan-300">
-              {profile?.name ? profile.name[0] : "P"}
+          {/* Email/Password Auth Module */}
+          {sessionUser ? (
+            <div className="flex items-center space-x-3 bg-white/[0.03] border border-white/[0.08] px-3.5 py-1.5 rounded-xl backdrop-blur-md">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center text-xs font-bold text-cyan-300">
+                {profile?.name ? profile.name[0].toUpperCase() : sessionUser.email[0].toUpperCase()}
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-semibold text-white leading-tight truncate max-w-[120px]">
+                  {profile?.name || sessionUser.email}
+                </div>
+                <div className="text-[10px] text-cyan-400 font-mono tracking-wider">
+                  {profile?.blood_group ? `TYPE ${profile.blood_group}` : "VERIFIED"}
+                </div>
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="p-1 rounded-lg hover:bg-white/10 text-neutral-400 hover:text-red-400 transition cursor-pointer"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <div className="text-left">
-              <div className="text-xs font-semibold text-white leading-tight">{profile?.name || "Attending Patient"}</div>
-              <div className="text-[10px] text-cyan-400 font-mono tracking-wider">TYPE {profile?.blood_group || "O+"}</div>
-            </div>
-          </div>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="flex items-center space-x-2 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-cyan-300 font-mono px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In / Up</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -592,7 +655,7 @@ export default function HealthCopilotApp() {
           </div>
         </aside>
 
-        {/* Dynamic Biometric Canvas */}
+        {/* Dynamic Canvas */}
         <main className="flex-1 p-8 overflow-y-auto">
           {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
@@ -637,7 +700,7 @@ export default function HealthCopilotApp() {
 
                   {documents.length === 0 ? (
                     <div className="p-10 text-center text-neutral-500 border border-dashed border-white/[0.08] rounded-2xl text-xs font-mono">
-                      No clinical records ingested. Click "Ingest Health Record" above to parse a lab report or prescription.
+                      No clinical records found. Click "Ingest Health Record" above to upload a lab report or prescription.
                     </div>
                   ) : (
                     <div className="space-y-3.5">
@@ -651,7 +714,7 @@ export default function HealthCopilotApp() {
                               <span className="text-neutral-400 font-mono text-[11px]">{doc.record_date} {doc.doctor_name && `&bull; ${doc.doctor_name}`}</span>
                               <button
                                 onClick={() => speakText(doc.plain_summary)}
-                                title="Listen to Summary"
+                                title="Listen"
                                 className="p-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 transition cursor-pointer"
                               >
                                 <Play className="w-3 h-3" />
@@ -677,7 +740,7 @@ export default function HealthCopilotApp() {
 
                   {reminders.length === 0 ? (
                     <div className="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-2xl">
-                      No active reminders. You can schedule alarms via the Copilot Chat.
+                      No active reminders. Schedule adherence alarms via Copilot Chat.
                     </div>
                   ) : (
                     <div className="space-y-2.5">
@@ -850,9 +913,9 @@ export default function HealthCopilotApp() {
               </div>
 
               <div className="grid grid-cols-2 gap-4 bg-white/[0.02] border border-white/[0.05] p-4 rounded-2xl text-xs font-sans">
-                <div><span className="text-neutral-400">Patient:</span> <strong className="text-white">{profile?.name || "Patient"}</strong></div>
-                <div><span className="text-neutral-400">Demographics:</span> <strong className="text-white">{profile?.age || "28"} &bull; {profile?.gender || "Not Specified"}</strong></div>
-                <div><span className="text-neutral-400">Blood Group:</span> <strong className="text-white">{profile?.blood_group || "O+"}</strong></div>
+                <div><span className="text-neutral-400">Patient:</span> <strong className="text-white">{profile?.name || "Not signed in"}</strong></div>
+                <div><span className="text-neutral-400">Age:</span> <strong className="text-white">{profile?.age || "--"}</strong></div>
+                <div><span className="text-neutral-400">Blood Group:</span> <strong className="text-white">{profile?.blood_group || "--"}</strong></div>
                 <div><span className="text-neutral-400">Documented Allergies:</span> <strong className="text-white">{profile?.allergies?.join(", ") || "None"}</strong></div>
               </div>
 
@@ -960,13 +1023,20 @@ export default function HealthCopilotApp() {
         onConfirm={handleConfirmSave}
       />
 
-      {/* Render the ABDM & FHIR Resource Modal */}
+      {/* ABDM & FHIR Resource Modal */}
       <AbhaModal
         isOpen={showAbhaModal}
         onClose={() => setShowAbhaModal(false)}
         documents={documents}
         biomarkers={biomarkers}
         medications={medications}
+      />
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={fetchDashboardData}
       />
     </div>
   );

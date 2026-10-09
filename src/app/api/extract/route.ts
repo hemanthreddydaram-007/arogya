@@ -1,107 +1,143 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || "";
+const genAI = new GoogleGenerativeAI(apiKey);
+
+export const maxDuration = 60; // Allow sufficient time for high-resolution vision inference
 
 export async function POST(req: Request) {
   try {
-    if (!apiKey) {
-      return NextResponse.json({ error: "GEMINI_API_KEY is missing in .env.local" }, { status: 500 });
-    }
-
     const { base64Data, mimeType, targetLanguage = "en" } = await req.json();
 
-    if (!base64Data) {
-      return NextResponse.json({ error: "No document data provided" }, { status: 400 });
+    if (!base64Data || !mimeType) {
+      return NextResponse.json({ error: "Missing document payload" }, { status: 400 });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const langDirective =
+      targetLanguage === "te"
+        ? "Telugu (తెలుగు)"
+        : targetLanguage === "hi"
+        ? "Hindi (हिन्दी)"
+        : "English";
 
-    const languageInstruction = 
-      targetLanguage === "te" ? "Translate plainSummary, abnormal explanations, and doctor questions into fluent TELUGU (తెలుగు)." :
-      targetLanguage === "hi" ? "Translate plainSummary, abnormal explanations, and doctor questions into fluent HINDI (हिन्दी)." :
-      "Provide plainSummary, abnormal explanations, and doctor questions in clear, empathetic ENGLISH.";
+    const prompt = `
+You are an expert Clinical Informatics & Hospital Documentation Specialist.
+Your task is to analyze this hospital record (which may be a handwritten prescription, diagnostic lab panel, discharge summary, or outpatient consult note) and produce an authoritative, comprehensive, patient-centered clinical summary following standard health communication guidelines.
 
-    const extractionPrompt = `
-You are an expert clinical ingestion and ABDM/FHIR interoperability engine.
-Analyze the provided medical document (prescription, laboratory report, or clinical note).
-Document may be bilingual or contain handwritten clinical script.
+TARGET LANGUAGE REQUIREMENT:
+Generate all patient-facing fields (plainSummary, diagnosis, abnormalFindings, normalFindings, medicationReconciliation, redFlagWarnings, lifestyleAndDiet, questionsForDoctor) in ${langDirective}. 
+If ${langDirective} is Telugu or Hindi, render fluent, natural regional script (keep drug names like Metformin/Paracetamol recognizable in parentheses if transliterated).
 
-${languageInstruction}
+Follow this strict clinical reasoning process:
+1. DOCUMENT IDENTIFICATION: Identify whether this is a prescription, laboratory report, discharge summary, or radiology/diagnostic report.
+2. CLINICAL CONTEXT: Extract the date, attending physician/hospital, and primary diagnoses/indications.
+3. BIOMARKER & TEST EXTRACTION:
+   - Identify every numerical test value, reference interval, and clinical unit.
+   - For any abnormal or borderline value, provide a clear, empathetic biological explanation: Explain what it biologically means in the human body (e.g. "Elevated HbA1c means excess glucose has bound to hemoglobin over the last 90 days, indicating insulin resistance").
+4. MEDICATION RECONCILIATION:
+   - Extract generic/brand name, exact strength (e.g. 500mg), route, frequency schedule (translate Latin codes like OD, BD, TDS, SOS into plain daily instructions like "Once daily in the morning"), duration, and purpose.
+   - Note if a medicine is newly started, continued, or stopped.
+   - If handwriting is unreadable, tag as "[Unclear: Confirm with pharmacist]".
+5. RED-FLAG WARNINGS: Identify emergency symptoms that require urgent medical attention based on the diagnosis and medications.
+6. ACTIONABLE FOLLOW-UP: Explicit next steps and smart, high-yield questions for the patient's next consultation.
 
-Extract and structure the data into JSON matching this exact schema:
+You MUST respond strictly with a valid JSON object with NO surrounding markdown or backticks:
+
 {
-  "docType": "prescription" | "lab_report" | "clinical_note",
+  "docType": "prescription" | "lab_report" | "discharge_summary" | "diagnostic_record",
   "recordDate": "YYYY-MM-DD",
-  "doctorName": "Physician name if present",
-  "diagnosis": "Primary diagnosis or clinical indication",
-  "plainSummary": "A clear, empathetic 2-sentence explanation of what this report says, free of complex jargon.",
-  "technicalSummary": "A precise clinical summary with key findings.",
-  "medications": [
+  "doctorName": "Doctor or Hospital name",
+  "primaryDiagnosis": "Primary diagnosis or clinical reason for consultation in ${langDirective}",
+  
+  "plainSummary": "A cohesive, 3-to-4 sentence compassionate summary in ${langDirective} explaining what happened, the overall health assessment, and the main goal of the treatment plan.",
+  "technicalSummary": "A precise clinical summary in English using medical nomenclature for clinical handover.",
+  
+  "abnormalFindings": [
     {
-      "name": "Medication name",
-      "dosage": "e.g. 500mg",
-      "frequency": "e.g. Twice daily after meals",
-      "duration": "e.g. 14 days"
+      "markerName": "Test Name",
+      "value": "Measured Value",
+      "referenceRange": "Normal Range",
+      "status": "high" | "low" | "critical",
+      "biologicalMeaning": "Simple explanation in ${langDirective} of why this value is out of range and what it means for the body"
     }
   ],
+
+  "normalFindings": [
+    {
+      "markerName": "Test Name",
+      "value": "Measured Value with unit",
+      "status": "normal"
+    }
+  ],
+
   "biomarkers": [
     {
-      "markerName": "e.g. HbA1c, Fasting Blood Sugar, Vitamin D",
-      "value": "Numeric value or result",
-      "unit": "e.g. mg/dL, ng/mL",
-      "status": "normal" | "high" | "low" | "critical",
-      "abnormalExplanation": "Clear, plain-language explanation of what this specific abnormal reading means for the human body and overall health."
+      "markerName": "Test Name",
+      "value": 120,
+      "unit": "mg/dL",
+      "status": "normal" | "high" | "low" | "critical"
     }
   ],
-  "questionsForDoctor": [
-    "Relevant, actionable questions the patient should ask their doctor at their next consultation"
-  ],
-  "fhirBundle": {
-    "resourceType": "Bundle",
-    "type": "collection",
-    "entry": [
-      {
-        "resource": {
-          "resourceType": "DiagnosticReport",
-          "status": "final",
-          "code": { "text": "Clinical Ingestion Document" }
-        }
-      }
-    ]
-  }
-}
 
-Return ONLY valid JSON. Do not wrap in markdown triple backticks.
+  "medications": [
+    {
+      "name": "Drug Name",
+      "dosage": "e.g. 500mg",
+      "frequency": "e.g. Twice daily after meals",
+      "duration": "e.g. 14 days",
+      "indication": "What this medicine treats",
+      "actionType": "started" | "continued" | "adjusted" | "discontinued"
+    }
+  ],
+
+  "redFlagWarnings": [
+    "Specific symptom warning requiring immediate hospital attention in ${langDirective}"
+  ],
+
+  "lifestyleAndDiet": [
+    "Practical diet or activity guidance based on the findings in ${langDirective}"
+  ],
+
+  "questionsForDoctor": [
+    "High-value question the patient should ask their doctor at their next visit in ${langDirective}"
+  ]
+}
 `;
 
-    const filePart = {
+    const imagePart = {
       inlineData: {
         data: base64Data,
-        mimeType: mimeType || "image/png"
+        mimeType: mimeType
       }
     };
 
-    let rawText = "";
+    let textResponse = "";
 
-    // Primary: gemini-3.1-flash-lite, Fallback: gemini-3.5-flash-lite
+    // Dual-model resilient execution (Primary: 3.1 Flash-Lite, Fallback: 3.5 Flash-Lite)
     try {
-      const primaryModel = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
-      const result = await primaryModel.generateContent([extractionPrompt, filePart]);
-      rawText = result.response.text();
-    } catch (modelErr: any) {
-      console.warn("Primary model error, falling back to gemini-3.5-flash-lite...", modelErr?.message);
+      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+      const result = await model.generateContent([prompt, imagePart]);
+      textResponse = result.response.text();
+    } catch {
       const fallbackModel = genAI.getGenerativeModel({ model: "gemini-3.5-flash-lite" });
-      const fallbackResult = await fallbackModel.generateContent([extractionPrompt, filePart]);
-      rawText = fallbackResult.response.text();
+      const fallbackResult = await fallbackModel.generateContent([prompt, imagePart]);
+      textResponse = fallbackResult.response.text();
     }
 
-    const cleanJson = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
-    const parsedData = JSON.parse(cleanJson);
+    // Clean JSON markdown wrappings if present
+    const cleaned = textResponse
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
 
+    const parsedData = JSON.parse(cleaned);
     return NextResponse.json(parsedData);
   } catch (error: any) {
-    console.error("Extraction error:", error);
-    return NextResponse.json({ error: error.message || "Failed to parse document" }, { status: 500 });
+    console.error("Clinical document summarization failure:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to process and summarize clinical document" },
+      { status: 500 }
+    );
   }
 }

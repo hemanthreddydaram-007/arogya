@@ -514,40 +514,42 @@ export default function HealthCopilotApp() {
         record_date: safeDate,
         doctor_name: extractedData.doctorName || "Attending Physician",
         plain_summary: extractedData.plainSummary,
-        technical_summary: extractedData.technicalSummary,
+        technical_summary: extractedData.technicalSummary || "",
         questions: extractedData.questionsForDoctor || []
       }]).select().single();
 
       if (docErr) throw docErr;
 
+      // Insert all extracted biomarkers
       if (extractedData.biomarkers?.length > 0) {
         const markerInserts = extractedData.biomarkers.map((b: any) => ({
           document_id: docData.id,
           user_id: sessionUser?.id || null,
           marker_name: b.markerName,
           value: b.value,
-          unit: b.unit,
-          status: b.status,
+          unit: b.unit || "",
+          status: b.status || "normal",
           test_date: safeDate
         }));
         await supabase.from("biomarkers").insert(markerInserts);
       }
 
+      // Insert all reconciled medications
       if (extractedData.medications?.length > 0) {
         const medInserts = extractedData.medications.map((m: any) => ({
           user_id: sessionUser?.id || null,
           name: m.name,
-          dosage: m.dosage,
-          frequency: m.frequency,
+          dosage: m.dosage || "As advised",
+          frequency: m.frequency || "Daily",
           duration: m.duration || "14 days",
-          status: "active"
+          status: m.actionType === "discontinued" ? "discontinued" : "active"
         }));
         await supabase.from("medications").insert(medInserts);
       }
 
       await supabase.from("audit_logs").insert([{
         user_id: sessionUser?.id || null,
-        action: "RECORD_INGESTION_AURA",
+        action: "CLINICAL_DOCUMENT_SUMMARY_COMMITTED",
         resource: extractedData.docType || "prescription"
       }]);
 
@@ -903,23 +905,40 @@ export default function HealthCopilotApp() {
                   ) : (
                     <div className="space-y-3.5">
                       {documents.slice(0, 3).map((doc, idx) => (
-                        <div key={idx} className="p-4.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/30 transition space-y-2">
+                        <div key={idx} className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/30 transition space-y-3">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="font-mono text-[10px] uppercase font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">
-                              {doc.doc_type}
-                            </span>
                             <div className="flex items-center space-x-2">
-                              <span className="text-neutral-400 font-mono text-[11px]">{doc.record_date} {doc.doctor_name && `• ${doc.doctor_name}`}</span>
+                              <span className="font-mono text-[10px] uppercase font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">
+                                {doc.doc_type}
+                              </span>
+                              <span className="text-neutral-400 font-mono text-[11px]">
+                                {doc.record_date}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {doc.doctor_name && (
+                                <span className="text-neutral-400 font-mono text-[11px] truncate max-w-[150px]">
+                                  {doc.doctor_name}
+                                </span>
+                              )}
                               <button
                                 onClick={() => speakText(doc.plain_summary)}
                                 title="Listen"
-                                className="p-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 transition cursor-pointer"
+                                className="p-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 transition cursor-pointer"
                               >
                                 <Play className="w-3 h-3" />
                               </button>
                             </div>
                           </div>
-                          <p className="text-xs text-neutral-200 leading-relaxed font-sans">{doc.plain_summary}</p>
+                          <p className="text-xs text-neutral-200 leading-relaxed font-sans">
+                            {doc.plain_summary}
+                          </p>
+                          {doc.questions && doc.questions.length > 0 && (
+                            <div className="pt-2 border-t border-white/[0.04] text-[11px] text-cyan-300 font-sans flex items-center space-x-1.5">
+                              <span className="font-mono font-bold text-[10px] text-cyan-400 uppercase">Suggested Question:</span>
+                              <span className="truncate">{doc.questions[0]}</span>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -971,7 +990,7 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 2: MEDICAL HISTORY (PREVIOUSLY CLINICAL LEDGER) */}
+          {/* TAB 2: MEDICAL HISTORY */}
           {activeTab === "timeline" && (
             <div className="max-w-4xl mx-auto space-y-6">
               <div>
@@ -1008,7 +1027,7 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 3: MY MEDICINES (PREVIOUSLY ACTIVE REGIMENS) */}
+          {/* TAB 3: MY MEDICINES */}
           {activeTab === "medications" && (
             <div className="max-w-4xl mx-auto space-y-6">
               <div>
@@ -1036,7 +1055,7 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 4: LAB TEST TRENDS (PREVIOUSLY SPECTRAL TRENDS) */}
+          {/* TAB 4: LAB TEST TRENDS */}
           {activeTab === "trends" && (
             <div className="max-w-4xl mx-auto space-y-6">
               <div className="flex items-center justify-between">
@@ -1087,7 +1106,7 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 5: DOCTOR VISIT SUMMARY (PREVIOUSLY PHYSICIAN DOSSIER) */}
+          {/* TAB 5: DOCTOR VISIT SUMMARY */}
           {activeTab === "doctor-prep" && (
             <div className="max-w-3xl mx-auto rounded-3xl bg-[#0A0E1A]/80 border border-white/[0.08] p-8 backdrop-blur-xl space-y-6">
               <div className="flex justify-between items-start border-b border-white/[0.08] pb-5">

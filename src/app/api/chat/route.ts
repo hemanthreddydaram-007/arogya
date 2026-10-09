@@ -1,118 +1,93 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "@/lib/supabaseClient";
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || "";
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(req: Request) {
   try {
-    if (!apiKey) {
-      return NextResponse.json({ error: "GEMINI_API_KEY is missing in .env.local" }, { status: 500 });
-    }
-
-    const { message } = await req.json();
+    const { message, language = "en" } = await req.json();
 
     if (!message) {
-      return NextResponse.json({ error: "Message prompt is required" }, { status: 400 });
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // 1. Retrieve current verified patient records for clinical RAG grounding
-    const { data: profile } = await supabase.from("profiles").select("*").limit(1).maybeSingle();
-    const { data: documents } = await supabase.from("documents").select("*").order("record_date", { ascending: false });
-    const { data: medications } = await supabase.from("medications").select("*");
-    const { data: biomarkers } = await supabase.from("biomarkers").select("*").order("test_date", { ascending: false });
-    const { data: reminders } = await supabase.from("reminders").select("*").order("time", { ascending: true });
+    // 1. Fetch grounded clinical telemetry
+    const { data: documents } = await supabase.from("documents").select("*").limit(10);
+    const { data: biomarkers } = await supabase.from("biomarkers").select("*").limit(20);
+    const { data: medications } = await supabase.from("medications").select("*").limit(15);
+    const { data: reminders } = await supabase.from("reminders").select("*").limit(15);
 
-    let actionTaken: string | undefined = undefined;
-    const lower = message.toLowerCase();
+    const targetLangName =
+      language === "te"
+        ? "Telugu (తెలుగు)"
+        : language === "hi"
+        ? "Hindi (हिन्दी)"
+        : "English";
 
-    // 2. Dynamic Reminder & Alarm Parser
-    if (lower.includes("remind") || lower.includes("reminder") || lower.includes("alarm")) {
-      try {
-        let extractedTime = "09:00 AM";
+    // 2. Strict Grounded Prompt with language enforcement
+    const systemPrompt = `
+You are the Health Copilot AI Agent for the Altrix Labs Clinical Platform.
+Your answers MUST be strictly grounded in the patient's verified medical records below.
+DO NOT hallucinate or extrapolate medical treatments not present in the records.
 
-        const match24 = message.match(/\b([01]?[0-9]|2[0-3]):([0-5][0-9])\b/);
-        const match12 = message.match(/\b(1[0-2]|0?[1-9]):([0-5][0-9])\s*(am|pm)\b/i);
+LANGUAGE REQUIREMENT:
+- You MUST answer COMPLETELY and FLUENTLY in ${targetLangName}.
+- If ${targetLangName} is Telugu or Hindi, render the entire response in that regional script.
+- Keep clinical drug names (e.g. Metformin, Atorvastatin) recognizable in Latin script or bracketed if transliterated.
 
-        if (match12) {
-          extractedTime = match12[0].toUpperCase();
-        } else if (match24) {
-          extractedTime = match24[0];
-        } else if (lower.includes("night") || lower.includes("bedtime")) {
-          extractedTime = "21:00";
-        } else if (lower.includes("evening")) {
-          extractedTime = "18:00";
-        } else if (lower.includes("afternoon")) {
-          extractedTime = "14:00";
-        } else if (lower.includes("morning")) {
-          extractedTime = "08:00";
-        }
+VERIFIED PATIENT HEALTH RECORDS:
+Documents: ${JSON.stringify(documents || [])}
+Biomarkers: ${JSON.stringify(biomarkers || [])}
+Active Medications: ${JSON.stringify(medications || [])}
+Reminders/Alarms: ${JSON.stringify(reminders || [])}
 
-        let cleanTitle = message
-          .replace(/^(please\s+)?(remind me to|set a reminder to|set an alarm for|remind me)\s*/i, "")
-          .replace(/\b(at|around)\s*([01]?[0-9]|2[0-3]):[0-5][0-9](\s*(am|pm))?\b/i, "")
-          .trim();
+TASK & ACTION DIRECTIVE:
+1. If the user asks to set a reminder or alarm (e.g. "remind me to take medicine at 8:00 AM"), extract the title and exact time (HH:MM format, 24-hr or AM/PM) and execute the action.
+2. If the user asks about their test values, explain what they mean in plain language in ${targetLangName}.
+3. Respond in concise, empathetic sentences.
 
-        cleanTitle = cleanTitle.replace(/^["']|["']$/g, "").trim();
+If an alarm is detected to be scheduled, append an ACTION token at the very end of your response:
+ACTION:CREATE_REMINDER|Title|Time
+`;
 
-        await supabase.from("reminders").insert([{
-          title: cleanTitle || "Medication Reminder",
-          time: extractedTime,
-          type: "medication"
-        }]);
+    // Attempt primary model with fallback
+    let reply = "";
+    let actionTaken: string | undefined;
 
-        actionTaken = `createReminder (set for ${extractedTime})`;
-      } catch (remErr) {
-        console.warn("Failed to auto-insert reminder:", remErr);
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+      const result = await model.generateContent([
+        { text: systemPrompt },
+        { text: `User query: ${message}` }
+      ]);
+      reply = result.response.text();
+    } catch {
+      const fallbackModel = genAI.getGenerativeModel({ model: "gemini-3.5-flash-lite" });
+      const fallbackResult = fallbackModel.generateContent([
+        { text: systemPrompt },
+        { text: `User query: ${message}` }
+      ]);
+      reply = (await fallbackResult).response.text();
+    }
+
+    // Action parsing (e.g., automated reminder creation)
+    if (reply.includes("ACTION:CREATE_REMINDER|")) {
+      const parts = reply.split("ACTION:CREATE_REMINDER|");
+      reply = parts[0].trim();
+      const actionData = parts[1]?.trim().split("|");
+      if (actionData && actionData.length >= 2) {
+        const title = actionData[0];
+        const time = actionData[1];
+        await supabase.from("reminders").insert([{ title, time, completed: false }]);
+        actionTaken = `Scheduled reminder for ${title} at ${time}`;
       }
     }
 
-    // 3. Assemble clinical grounding context
-    const contextText = `
-=== VERIFIED PATIENT CLINICAL DATA ===
-Patient Profile: ${JSON.stringify(profile || {})}
-Active Regimens: ${JSON.stringify(medications || [])}
-Tracked Biomarkers: ${JSON.stringify(biomarkers || [])}
-Clinical Documents & Consultation Notes: ${JSON.stringify(documents || [])}
-Active Reminders & Alarms: ${JSON.stringify(reminders || [])}
-=======================================
-`;
-
-    const systemInstruction = `You are Health Copilot, an autonomous clinical assistant.
-CRITICAL LANGUAGE REQUIREMENT: You MUST ALWAYS respond in clear, professional English. Never answer in Hindi or any other language unless the user explicitly commands: "Translate into [Language]".
-Ground every answer strictly on the provided verified patient data.
-Never fabricate dates, dosages, or lab numbers.
-Explain findings concisely and directly. Always maintain safety guardrails: never independently alter prescription regimens, and remind the user to consult their physician.`;
-
-    const prompt = `${contextText}\n\nUser Question: ${message}`;
-    const genAI = new GoogleGenerativeAI(apiKey);
-
-    let replyText = "";
-
-    // 4. Primary: gemini-3.1-flash-lite, Fallback: gemini-3.5-flash-lite
-    try {
-      const primaryModel = genAI.getGenerativeModel({
-        model: "gemini-3.1-flash-lite",
-        systemInstruction
-      });
-      const result = await primaryModel.generateContent(prompt);
-      replyText = result.response.text();
-    } catch (modelErr: any) {
-      console.warn("gemini-3.1-flash-lite error, falling back to gemini-3.5-flash-lite...", modelErr?.message);
-      const fallbackModel = genAI.getGenerativeModel({
-        model: "gemini-3.5-flash-lite",
-        systemInstruction
-      });
-      const fallbackResult = await fallbackModel.generateContent(prompt);
-      replyText = fallbackResult.response.text();
-    }
-
-    return NextResponse.json({
-      reply: replyText,
-      actionTaken
-    });
+    return NextResponse.json({ reply, actionTaken });
   } catch (error: any) {
     console.error("Chat agent error:", error);
-    return NextResponse.json({ error: error.message || "Failed to communicate with Health Copilot" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Failed to formulate response" }, { status: 500 });
   }
 }

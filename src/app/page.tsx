@@ -6,7 +6,7 @@ import {
   Activity, UploadCloud, Pill, Calendar, Clock, MessageSquare, 
   FileText, TrendingUp, ShieldCheck, CheckCircle2, Mic, MicOff, Printer,
   RefreshCw, Send, Bell, BellRing, Volume2, VolumeX,
-  ChevronRight, Sparkles, Heart, Play, LogIn, LogOut
+  ChevronRight, Sparkles, Heart, Play, LogIn, LogOut, Building2
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ConfirmModal } from "@/components/ConfirmModal";
@@ -29,6 +29,10 @@ const TRANSLATIONS = {
     menuHeader: "Navigation",
     groundedSafeguard: "Verified Medical Safety",
     safeguardDesc: "AI answers are strictly checked against your uploaded prescriptions and lab reports.",
+    abdmBannerTitle: "Join Ayushman Bharat Digital Mission (ABDM)",
+    abdmBannerTag: "GOVERNMENT OF INDIA",
+    abdmBannerDesc: "An initiative by the Government of India to create a seamless, integrated digital healthcare ecosystem across the country. Connect your 14-digit ABHA ID or Aadhaar to securely sync records.",
+    abdmConnectBtn: "Connect",
     nav: {
       radar: "Health Overview",
       ledger: "Medical History",
@@ -92,6 +96,10 @@ const TRANSLATIONS = {
     menuHeader: "ముఖ్య విభాగాలు",
     groundedSafeguard: "వైద్య భద్రతా రక్షణ",
     safeguardDesc: "సమాధానాలు కేవలం మీ డాక్టర్ ప్రిస్క్రిప్షన్లు మరియు ల్యాబ్ రిపోర్టుల ఆధారంగా మాత్రమే ఉంటాయి.",
+    abdmBannerTitle: "ఆయుష్మాన్ భారత్ డిజిటల్ మిషన్ (ABDM) లో చేరండి",
+    abdmBannerTag: "భారత ప్రభుత్వం",
+    abdmBannerDesc: "దేశవ్యాప్తంగా సురక్షిత డిజిటల్ ఆరోగ్య వ్యవస్థను రూపొందించడానికి భారత ప్రభుత్వ కార్యక్రమం. మీ రికార్డులను సమకాలీకరించడానికి 14 అంకెల ABHA నంబర్ లేదా ఆధార్‌ను అనుసంధానించండి.",
+    abdmConnectBtn: "కనెక్ట్ చేయండి",
     nav: {
       radar: "ఆరోగ్య అవలోకనం",
       ledger: "వైద్య చరిత్ర",
@@ -155,6 +163,10 @@ const TRANSLATIONS = {
     menuHeader: "मुख्य मेनू",
     groundedSafeguard: "सत्यापित सुरक्षा",
     safeguardDesc: "सभी उत्तर केवल आपकी अपलोड की गई रिपोर्ट और पर्चियों पर आधारित हैं।",
+    abdmBannerTitle: "आयुष्मान भारत डिजिटल मिशन (ABDM) से जुड़ें",
+    abdmBannerTag: "भारत सरकार",
+    abdmBannerDesc: "देश भर में एकीकृत डिजिटल स्वास्थ्य सेवा के लिए भारत सरकार की पहल। अपने मेडिकल रिकॉर्ड सुरक्षित रूप से सिंक करने के लिए अपना 14-अंकीय ABHA नंबर या आधार लिंक करें।",
+    abdmConnectBtn: "कनेक्ट करें",
     nav: {
       radar: "स्वास्थ्य अवलोकन",
       ledger: "चिकित्सा इतिहास",
@@ -860,7 +872,7 @@ export default function HealthCopilotApp() {
           {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
             <div className="max-w-6xl mx-auto space-y-7 animate-in fade-in duration-200">
-              {/* Metric Cards */}
+              {/* Telemetry Metric Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   { label: t.metrics.docs, val: documents.length, desc: t.metrics.docsDesc, icon: FileText, border: "border-cyan-500/20", glow: "from-cyan-500/10 to-transparent", text: "text-cyan-400" },
@@ -884,7 +896,36 @@ export default function HealthCopilotApp() {
                 })}
               </div>
 
-              {/* Feed: Clinical Summaries */}
+              {/* ABDM Official NHA Banner Card (Matches Mobile Screenshot) */}
+              <div 
+                onClick={() => setShowAbhaModal(true)}
+                className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950/20 via-[#0A101D] to-cyan-950/20 border border-emerald-500/30 hover:border-emerald-400/50 backdrop-blur-xl transition cursor-pointer flex items-center justify-between group shadow-[0_0_30px_rgba(16,185,129,0.06)]"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h4 className="text-sm font-bold text-white tracking-tight">
+                        {t.abdmBannerTitle}
+                      </h4>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                        {t.abdmBannerTag}
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-300 mt-1 font-sans max-w-2xl leading-relaxed">
+                      {t.abdmBannerDesc}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2 text-emerald-400 text-xs font-bold font-mono pl-4 shrink-0">
+                  <span>{t.abdmConnectBtn}</span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+                </div>
+              </div>
+
+              {/* Feed: Clinical Summaries & Alarms */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 rounded-3xl bg-[#0A0E1A]/60 border border-white/[0.08] p-6 backdrop-blur-2xl space-y-5">
                   <div className="flex items-center justify-between">
@@ -1242,6 +1283,7 @@ export default function HealthCopilotApp() {
         onConfirm={handleConfirmSave}
       />
 
+      {/* ABDM & FHIR Resource Modal */}
       <AbhaModal
         isOpen={showAbhaModal}
         onClose={() => setShowAbhaModal(false)}
@@ -1250,6 +1292,7 @@ export default function HealthCopilotApp() {
         medications={medications}
       />
 
+      {/* Authentication Modal */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}

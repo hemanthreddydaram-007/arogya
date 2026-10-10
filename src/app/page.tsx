@@ -13,134 +13,133 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import { AbhaModal } from "@/components/AbhaModal";
 import { AuthModal } from "@/components/AuthModal";
 
-// Multilingual UI Dictionaries with Simple, Universal Terminology
 const TRANSLATIONS = {
   en: {
-    appTitle: "HEALTH COPILOT",
-    edition: "ALTRIX EDITION",
-    telemetryLive: "SYSTEM ACTIVE",
-    abdmReady: "ABDM / FHIR READY",
-    sirenTest: "Sound Test",
-    ingesting: "Analyzing File...",
+    appTitle: "Health Copilot",
+    edition: "Patient Portal",
+    telemetryLive: "Online",
+    abdmReady: "ABHA / ABDM Ready",
+    sirenTest: "Test Alert",
+    ingesting: "Analyzing...",
     ingestBtn: "Upload Report",
     cameraBtn: "Take Photo",
-    signInUp: "Sign In / Up",
+    signInUp: "Sign In / Register",
     signOut: "Sign Out",
-    verifiedStatus: "VERIFIED",
-    menuHeader: "Navigation",
-    groundedSafeguard: "Verified Medical Safety",
-    safeguardDesc: "AI answers are strictly checked against your uploaded prescriptions and lab reports.",
-    abdmBannerTitle: "Join Ayushman Bharat Digital Mission (ABDM)",
-    abdmBannerTag: "GOVERNMENT OF INDIA",
-    abdmBannerDesc: "An initiative by the Government of India to create a seamless, integrated digital healthcare ecosystem across the country. Connect your 14-digit ABHA ID or Aadhaar to securely sync records.",
-    abdmConnectBtn: "Connect",
-    signInRequired: "Please sign in to upload reports or use the camera.",
+    verifiedStatus: "Verified",
+    menuHeader: "Main Menu",
+    groundedSafeguard: "Clinical Grounding",
+    safeguardDesc: "Responses are strictly validated against your uploaded medical records and prescriptions.",
+    abdmBannerTitle: "Ayushman Bharat Digital Mission (ABDM)",
+    abdmBannerTag: "Govt. of India",
+    abdmBannerDesc: "Connect your ABHA ID or Aadhaar to securely synchronize and access your official digital health records.",
+    abdmConnectBtn: "Link ABHA",
+    signInRequired: "Please sign in to upload files or access records.",
     nav: {
-      radar: "Health Overview",
-      ledger: "Medical History",
-      regimens: "My Medicines",
-      trends: "Lab Test Trends",
-      dossier: "Doctor Visit Summary",
-      agent: "AI Health Assistant"
+      radar: "Overview",
+      ledger: "Medical Timeline",
+      regimens: "Prescriptions",
+      trends: "Lab Trends",
+      dossier: "Doctor Summary",
+      agent: "Health Copilot"
     },
     metrics: {
       docs: "Uploaded Reports",
-      docsDesc: "Analyzed by AI",
+      docsDesc: "Analyzed documents",
       regimens: "Active Medicines",
-      regimensDesc: "Prescribed daily courses",
-      markers: "Tracked Lab Values",
-      markersDesc: "Health indicators",
-      alarms: "Medicine Reminders",
-      alarmsDesc: "Active alerts"
+      regimensDesc: "Ongoing prescriptions",
+      markers: "Tracked Markers",
+      markersDesc: "Lab test values",
+      alarms: "Reminders",
+      alarmsDesc: "Active medicine alerts"
     },
-    summariesTitle: "Recent Report Summaries",
-    fullTimeline: "View Full History",
-    noDocs: "No medical records found. Click 'Upload Report' or 'Take Photo' above to scan a lab report or prescription.",
-    dailyAlarms: "Medicine Reminders",
-    armed: "ACTIVE",
-    noReminders: "No reminders set. You can say 'Set a reminder for my medicine at 8:00 AM' in the AI Assistant.",
-    timelineHeader: "Medical History & Timeline",
-    timelineSub: "Chronological list of all your past doctor visits, prescriptions, and lab tests",
-    regimensHeader: "My Medicines & Dosages",
-    regimensSub: "All active medications extracted accurately from your doctor prescriptions",
+    summariesTitle: "Recent Medical Records",
+    fullTimeline: "View Complete History",
+    noDocs: "No clinical records found. Click 'Upload Report' or 'Take Photo' above to add your first record.",
+    dailyAlarms: "Daily Medicine Alerts",
+    armed: "Active",
+    noReminders: "No alarms configured. Ask the AI assistant to set reminders for your prescribed medicines.",
+    timelineHeader: "Medical History & Clinical Timeline",
+    timelineSub: "Chronological documentation of consultations, prescriptions, and laboratory reports.",
+    regimensHeader: "Active Medications & Dosages",
+    regimensSub: "Medication regimens parsed directly from verified physician prescriptions.",
     dosage: "Dosage",
-    schedule: "When to take",
-    duration: "How long",
-    trendsHeader: "Lab Test Progress & Charts",
-    trendsSub: "See how your lab numbers (like Sugar, Cholesterol, or Vitamins) change over time",
-    filterPlaceholder: "Search test (e.g. Vitamin D, Sugar)",
-    needMorePoints: "Upload at least 2 reports containing this test to see your progress graph.",
-    dossierHeader: "Doctor Visit Summary",
-    dossierSub: "Ready-to-print summary of your medicines, allergies, and questions for your doctor",
+    schedule: "Instructions",
+    duration: "Duration",
+    trendsHeader: "Laboratory Marker Progression",
+    trendsSub: "Monitor numerical shifts across blood tests, vitamins, and metabolic panels.",
+    filterPlaceholder: "Search marker (e.g. Vitamin D, Sugar)...",
+    needMorePoints: "Upload at least 2 reports tracking this biomarker to render a historical curve.",
+    dossierHeader: "Physician Consultation Brief",
+    dossierSub: "Printable briefing containing known allergies, active courses, and suggested clinical questions.",
     printBrief: "Print Summary",
     patient: "Patient Name",
     age: "Age",
     bloodGroup: "Blood Group",
-    allergies: "Known Allergies",
-    currentRegimens: "Current Medicines",
-    suggestedQuestions: "Important Questions for Your Doctor",
-    agentTitle: "AI Health Assistant",
-    chatPlaceholder: "Ask about your medicines, lab values, or set reminders...",
-    welcomeChat: "Hello! How can I assist you with your health records or medications today?",
-    formulating: "Checking your medical records..."
+    allergies: "Documented Allergies",
+    currentRegimens: "Current Regimens",
+    suggestedQuestions: "Recommended Questions for Your Doctor",
+    agentTitle: "Clinical AI Assistant",
+    chatPlaceholder: "Ask about your medications, past reports, or set reminders...",
+    welcomeChat: "Hello! How can I assist you with your health records, lab reports, or medications today?",
+    formulating: "Searching medical records..."
   },
   te: {
     appTitle: "హెల్త్ కోపైలట్",
-    edition: "ఆల్ట్రిక్స్ ఎడిషన్",
-    telemetryLive: "వ్యవస్థ సిద్ధంగా ఉంది",
-    abdmReady: "ABDM / FHIR సిద్ధం",
-    sirenTest: "శబ్దం పరీక్ష",
-    ingesting: "విశ్లేషిస్తోంది...",
+    edition: "పేషెంట్ పోర్టల్",
+    telemetryLive: "సిస్టమ్ సిద్ధం",
+    abdmReady: "ABDM / FHIR కనెక్టెడ్",
+    sirenTest: "సౌండ్ టెస్ట్",
+    ingesting: "పరిశీలిస్తోంది...",
     ingestBtn: "రిపోర్ట్ అప్‌లోడ్",
     cameraBtn: "ఫోటో తీయండి",
     signInUp: "లాగిన్ / రిజిస్టర్",
     signOut: "లాగ్ అవుట్",
     verifiedStatus: "ధృవీకరించబడింది",
-    menuHeader: "ముఖ్య విభాగాలు",
+    menuHeader: "విభాగాలు",
     groundedSafeguard: "వైద్య భద్రతా రక్షణ",
     safeguardDesc: "సమాధానాలు కేవలం మీ డాక్టర్ ప్రిస్క్రిప్షన్లు మరియు ల్యాబ్ రిపోర్టుల ఆధారంగా మాత్రమే ఉంటాయి.",
-    abdmBannerTitle: "ఆయుష్మాన్ భారత్ డిజిటల్ మిషన్ (ABDM) లో చేరండి",
+    abdmBannerTitle: "ఆయుష్మాన్ భారత్ డిజిటల్ మిషన్ (ABDM)",
     abdmBannerTag: "భారత ప్రభుత్వం",
-    abdmBannerDesc: "దేశవ్యాప్తంగా సురక్షిత డిజిటల్ ఆరోగ్య వ్యవస్థను రూపొందించడానికి భారత ప్రభుత్వ కార్యక్రమం. మీ రికార్డులను సమకాలీకరించడానికి 14 అంకెల ABHA నంబర్ లేదా ఆధార్‌ను అనుసంధానించండి.",
+    abdmBannerDesc: "మీ రికార్డులను సురక్షితంగా సమకాలీకరించడానికి మీ ABHA ID లేదా ఆధార్‌ను అనుసంధానించండి.",
     abdmConnectBtn: "కనెక్ట్ చేయండి",
-    signInRequired: "మెడికల్ రికార్డులను అప్‌లోడ్ చేయడానికి లేదా కెమెరా వాడటానికి దయచేసి ముందుగా లాగిన్ అవ్వండి.",
+    signInRequired: "రికార్డులను అప్‌లోడ్ చేయడానికి దయచేసి లాగిన్ అవ్వండి.",
     nav: {
-      radar: "ఆరోగ్య అవలోకనం",
+      radar: "అవలోకనం",
       ledger: "వైద్య చరిత్ర",
-      regimens: "నా మందులు",
-      trends: "ల్యాబ్ పరీక్షల గ్రాఫ్",
-      dossier: "డాక్టర్ సందర్శన పత్రం",
+      regimens: "మందుల వివరాలు",
+      trends: "ల్యాబ్ మార్పులు",
+      dossier: "డాక్టర్ సారాంశం",
       agent: "ఏఐ సహాయకుడు"
     },
     metrics: {
-      docs: "అప్‌లోడ్ చేసిన రికార్డులు",
-      docsDesc: "ఏఐ ద్వారా పరిశీలించబడింది",
-      regimens: "ప్రస్తుత మందులు",
-      regimensDesc: "రోజూ వాడవలసినవి",
-      markers: "రక్త పరీక్ష ఫలితాలు",
-      markersDesc: "ట్రాక్ చేయబడిన విలువలు",
-      alarms: "మందుల అలారాలు",
-      alarmsDesc: "యాక్టివ్ టైమర్లు"
+      docs: "రిపోర్టులు",
+      docsDesc: "విశ్లేషించిన పత్రాలు",
+      regimens: "వాడుతున్న మందులు",
+      regimensDesc: "ప్రస్తుత కోర్సులు",
+      markers: "ట్రాక్ చేసిన పరీక్షలు",
+      markersDesc: "ల్యాబ్ విలువలు",
+      alarms: "రిమైండర్లు",
+      alarmsDesc: "యాక్టివ్ అలారాలు"
     },
     summariesTitle: "ఇటీవలి నివేదికల సారాంశాలు",
-    fullTimeline: "మొత్తం చరిత్ర చూడండి",
-    noDocs: "ఎటువంటి రికార్డులు లేవు. రిపోర్ట్ అప్‌లోడ్ చేయడానికి లేదా ఫోటో తీయడానికి పైన ఉన్న బటన్ నొక్కండి.",
-    dailyAlarms: "మందుల రిమైండర్లు",
+    fullTimeline: "పూర్తి చరిత్ర చూడండి",
+    noDocs: "ఎటువంటి రికార్డులు లేవు. రిపోర్ట్ అప్‌లోడ్ చేయడానికి పై బటన్ నొక్కండి.",
+    dailyAlarms: "మందుల అలారాలు",
     armed: "సిద్ధం",
-    noReminders: "రిమైండర్లు లేవు. చాట్‌లో 'ఉదయం 8 గంటలకు మందుల అలారం పెట్టు' అని చెప్పవచ్చు.",
+    noReminders: "రిమైండర్లు లేవు. చాట్‌లో అలారం సెట్ చేయమని కోరవచ్చు.",
     timelineHeader: "ఆరోగ్య చరిత్ర & వివరాలు",
-    timelineSub: "మీ మునుపటి డాక్టర్ సందర్శనలు మరియు ల్యాబ్ పరీక్షల కాలక్రమ జాబితా",
+    timelineSub: "మీ మునుపటి డాక్టర్ సందర్శనలు మరియు ల్యాబ్ పరీక్షల కాలక్రమ జాబితా.",
     regimensHeader: "నా మందులు & మోతాదు వివరాలు",
-    regimensSub: "మీ ప్రిస్క్రిప్షన్ల నుండి సేకరించిన పూర్తి మందుల వివరాలు",
+    regimensSub: "మీ ప్రిస్క్రిప్షన్ల నుండి సేకరించిన పూర్తి మందుల సమాచారం.",
     dosage: "మోతాదు",
     schedule: "ఎప్పుడు తీసుకోవాలి",
     duration: "ఎన్ని రోజులు",
-    trendsHeader: "ల్యాబ్ మార్పుల చార్ట్",
-    trendsSub: "కాలక్రమేణా మీ రక్త పరీక్షల ఫలితాలు ఎలా మారాయో చూడండి",
-    filterPlaceholder: "పరీక్ష పేరు (ఉదా: Vitamin D, Glucose)",
-    needMorePoints: "ఈ పరీక్షకు గ్రాఫ్ చూడటానికి కనీసం 2 వేర్వేరు తేదీల నివేదికలు అవసరం.",
-    dossierHeader: "డాక్టర్ సందర్శన సంక్షిప్త పత్రం",
-    dossierSub: "డాక్టర్‌ను కలిసే సమయంలో చూపించడానికి సిద్ధం చేసిన నివేదిక",
+    trendsHeader: "ల్యాబ్ మార్పుల గ్రాఫ్",
+    trendsSub: "కాలక్రమేణా మీ రక్త పరీక్షల ఫలితాలు ఎలా మారాయో చూడండి.",
+    filterPlaceholder: "పరీక్ష పేరు (ఉదా: Vitamin D, Glucose)...",
+    needMorePoints: "గ్రాఫ్ చూడటానికి కనీసం 2 వేర్వేరు తేదీల నివేదికలు అవసరం.",
+    dossierHeader: "డాక్టర్ సందర్శన పత్రం",
+    dossierSub: "డాక్టర్‌ను కలిసే సమయంలో చూపించడానికి సిద్ధం చేసిన నివేదిక.",
     printBrief: "ప్రింట్ చేయండి",
     patient: "రోగి పేరు",
     age: "వయస్సు",
@@ -150,66 +149,66 @@ const TRANSLATIONS = {
     suggestedQuestions: "డాక్టర్‌ని అడగవలసిన ముఖ్యమైన ప్రశ్నలు",
     agentTitle: "ఏఐ ఆరోగ్య సహాయకుడు",
     chatPlaceholder: "మందుల గురించి అడగండి లేదా అలారం సెట్ చేయండి...",
-    welcomeChat: "నమస్కారం! మీ ఆరోగ్య రికార్డులు లేదా మందుల గురించి నేను మీకు ఎలా సహాయపడగలను?",
+    welcomeChat: "నమస్కారం! మీ ఆరోగ్య రికార్డుల గురించి నేను మీకు ఎలా సహాయపడగలను?",
     formulating: "సమాధానం సిద్ధం చేస్తోంది..."
   },
   hi: {
     appTitle: "हेल्थ कोपायलट",
-    edition: "ऑल्ट्रिक्स एडिशन",
-    telemetryLive: "सिस्टम सक्रिय",
-    abdmReady: "ABDM / FHIR तैयार",
-    sirenTest: "आवाज टेस्ट",
-    ingesting: "प्रक्रिया जारी...",
+    edition: "पेशेंट पोर्टल",
+    telemetryLive: "सक्रिय",
+    abdmReady: "ABDM / FHIR कनेक्टेड",
+    sirenTest: "अलार्म टेस्ट",
+    ingesting: "विश्लेषण जारी...",
     ingestBtn: "रिपोर्ट अपलोड करें",
-    cameraBtn: "फोटो खींचें",
+    cameraBtn: "फोटो लें",
     signInUp: "साइन इन / रजिस्टर",
     signOut: "लॉग आउट",
     verifiedStatus: "सत्यापित",
     menuHeader: "मुख्य मेनू",
     groundedSafeguard: "सत्यापित सुरक्षा",
     safeguardDesc: "सभी उत्तर केवल आपकी अपलोड की गई रिपोर्ट और पर्चियों पर आधारित हैं।",
-    abdmBannerTitle: "आयुष्मान भारत डिजिटल मिशन (ABDM) से जुड़ें",
+    abdmBannerTitle: "आयुष्मान भारत डिजिटल मिशन (ABDM)",
     abdmBannerTag: "भारत सरकार",
-    abdmBannerDesc: "देश भर में एकीकृत डिजिटल स्वास्थ्य सेवा के लिए भारत सरकार की पहल। अपने मेडिकल रिकॉर्ड सुरक्षित रूप से सिंक करने के लिए अपना 14-अंकीय ABHA नंबर या आधार लिंक करें।",
-    abdmConnectBtn: "कनेक्ट करें",
-    signInRequired: "मेडिकल रिकॉर्ड अपलोड करने या कैमरा इस्तेमाल करने के लिए कृपया पहले साइन इन करें।",
+    abdmBannerDesc: "अपने मेडिकल रिकॉर्ड सुरक्षित रूप से सिंक करने के लिए अपना ABHA ID या आधार लिंक करें।",
+    abdmConnectBtn: "लिंक करें",
+    signInRequired: "मेडिकल रिकॉर्ड अपलोड करने के लिए कृपया पहले साइन इन करें।",
     nav: {
       radar: "स्वास्थ्य अवलोकन",
       ledger: "चिकित्सा इतिहास",
-      regimens: "मेरी दवाइयाँ",
-      trends: "लैब टेस्ट ग्राफ",
-      dossier: "डॉक्टर विजिट फाइल",
+      regimens: "दवाइयाँ",
+      trends: "लैब ग्राफ",
+      dossier: "डॉक्टर सारांश",
       agent: "एआई सहायक"
     },
     metrics: {
-      docs: "अपलोड की गई रिपोर्ट",
-      docsDesc: "एआई द्वारा विश्लेषित",
+      docs: "अपलोड रिपोर्ट",
+      docsDesc: "विश्लेषित दस्तावेज",
       regimens: "सक्रिय दवाइयाँ",
       regimensDesc: "नियमित खुराक",
       markers: "ट्रैक किए गए टेस्ट",
       markersDesc: "स्वास्थ्य सूचक",
-      alarms: "दवा के अलार्म",
+      alarms: "अलार्म",
       alarmsDesc: "सक्रिय रिमाइंडर"
     },
-    summariesTitle: "रिपोर्ट का सारांश",
+    summariesTitle: "हालिया रिपोर्ट सारांश",
     fullTimeline: "पूरा इतिहास देखें",
-    noDocs: "कोई रिकॉर्ड उपलब्ध नहीं है। रिपोर्ट अपलोड करने या फोटो लेने के लिए ऊपर दिए गए बटन पर क्लिक करें।",
-    dailyAlarms: "दैनिक दवा अलार्म",
+    noDocs: "कोई रिकॉर्ड उपलब्ध नहीं है। रिपोर्ट अपलोड करने के लिए ऊपर दिए गए बटन पर क्लिक करें।",
+    dailyAlarms: "दवा रिमाइंडर",
     armed: "सक्रिय",
     noReminders: "कोई अलार्म सक्रिय नहीं है। चैट में अलार्म सेट करने के लिए कहें।",
     timelineHeader: "स्वास्थ्य इतिहास और समयरेखा",
-    timelineSub: "आपकी पिछली डॉक्टर मुलाकातों और जांच रिपोर्ट का संपूर्ण विवरण",
+    timelineSub: "आपकी पिछली डॉक्टर मुलाकातों और जांच रिपोर्ट का संपूर्ण विवरण।",
     regimensHeader: "मेरी दवाइयाँ और खुराक",
-    regimensSub: "आपकी डॉक्टर पर्चियों से निकाली गई सक्रिय दवाइयाँ",
+    regimensSub: "आपकी डॉक्टर पर्चियों से निकाली गई दवाइयों का विवरण।",
     dosage: "खुराक",
     schedule: "कब लेनी है",
     duration: "कितने दिन",
-    trendsHeader: "लैब टेस्ट के रुझान और ग्राफ",
-    trendsSub: "देखें कि समय के साथ आपकी जांच रिपोर्ट के अंक कैसे बदले हैं",
-    filterPlaceholder: "खोजें (उदा. Vitamin D, Sugar)",
+    trendsHeader: "लैब टेस्ट के रुझान",
+    trendsSub: "देखें कि समय के साथ आपकी जांच रिपोर्ट के अंक कैसे बदले हैं।",
+    filterPlaceholder: "खोजें (उदा. Vitamin D, Sugar)...",
     needMorePoints: "ग्राफ देखने के लिए कम से कम 2 अलग-अलग तारीखों की रिपोर्ट आवश्यक हैं।",
     dossierHeader: "डॉक्टर विजिट फाइल",
-    dossierSub: "डॉक्टर को दिखाने के लिए तैयार की गई संक्षिप्त रिपोर्ट",
+    dossierSub: "डॉक्टर को दिखाने के लिए तैयार की गई संक्षिप्त रिपोर्ट।",
     printBrief: "प्रिंट करें",
     patient: "मरीज़ का नाम",
     age: "उम्र",
@@ -227,14 +226,12 @@ const TRANSLATIONS = {
 export default function HealthCopilotApp() {
   const [activeTab, setActiveTab] = useState<"overview" | "timeline" | "medications" | "trends" | "chat" | "doctor-prep">("overview");
 
-  // Multi-Language State
   const [selectedLang, setSelectedLang] = useState<"en" | "te" | "hi">("en");
   const t = TRANSLATIONS[selectedLang];
 
   const [showAbhaModal, setShowAbhaModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Authenticated User State
   const [sessionUser, setSessionUser] = useState<any>(null);
   const [profile, setProfile] = useState<{
     name: string;
@@ -244,27 +241,20 @@ export default function HealthCopilotApp() {
     allergies: string[];
   } | null>(null);
 
-  // Clinical Records State
   const [documents, setDocuments] = useState<any[]>([]);
   const [medications, setMedications] = useState<any[]>([]);
   const [reminders, setReminders] = useState<any[]>([]);
   const [biomarkers, setBiomarkers] = useState<any[]>([]);
 
-  // Extraction & Upload State
   const [uploading, setUploading] = useState(false);
   const [extractedData, setExtractedData] = useState<any>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // Adherence Alarm State
   const [activeAlarm, setActiveAlarm] = useState<any>(null);
   const triggeredAlarmsRef = useRef<Set<string>>(new Set());
 
-  // AI Copilot Agent State
   const [chatMessages, setChatMessages] = useState<{ role: "user" | "copilot"; text: string; action?: string }[]>([
-    { 
-      role: "copilot", 
-      text: TRANSLATIONS.en.welcomeChat
-    }
+    { role: "copilot", text: TRANSLATIONS.en.welcomeChat }
   ]);
   const [inputPrompt, setInputPrompt] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
@@ -286,19 +276,30 @@ export default function HealthCopilotApp() {
       if (session?.user) {
         setSessionUser(session.user);
         loadUserProfile(session.user);
+        fetchDashboardData(session.user);
+      } else {
+        setSessionUser(null);
+        setProfile(null);
+        setDocuments([]);
+        setMedications([]);
+        setReminders([]);
+        setBiomarkers([]);
       }
-      fetchDashboardData();
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setSessionUser(session.user);
         loadUserProfile(session.user);
+        fetchDashboardData(session.user);
       } else {
         setSessionUser(null);
         setProfile(null);
+        setDocuments([]);
+        setMedications([]);
+        setReminders([]);
+        setBiomarkers([]);
       }
-      fetchDashboardData();
     });
 
     requestNotificationPermission();
@@ -396,8 +397,8 @@ export default function HealthCopilotApp() {
           playAlarmSound();
 
           if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-            new Notification(`Adherence Alert: ${r.title}`, {
-              body: `Scheduled trigger time: ${r.time}.`,
+            new Notification(`Prescription Reminder: ${r.title}`, {
+              body: `Scheduled time: ${r.time}.`,
               icon: "/favicon.ico"
             });
           }
@@ -408,19 +409,47 @@ export default function HealthCopilotApp() {
     return () => clearInterval(interval);
   }, [reminders]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (userParam?: any) => {
+    const targetUser = userParam || sessionUser;
+
+    if (!targetUser?.id) {
+      setDocuments([]);
+      setMedications([]);
+      setReminders([]);
+      setBiomarkers([]);
+      return;
+    }
+
     try {
-      const { data: docs } = await supabase.from("documents").select("*").order("record_date", { ascending: false });
-      const { data: meds } = await supabase.from("medications").select("*");
-      const { data: rems } = await supabase.from("reminders").select("*").order("time", { ascending: true });
-      const { data: bio } = await supabase.from("biomarkers").select("*").order("test_date", { ascending: true });
+      const { data: docs } = await supabase
+        .from("documents")
+        .select("*")
+        .eq("user_id", targetUser.id)
+        .order("record_date", { ascending: false });
+
+      const { data: meds } = await supabase
+        .from("medications")
+        .select("*")
+        .eq("user_id", targetUser.id);
+
+      const { data: rems } = await supabase
+        .from("reminders")
+        .select("*")
+        .eq("user_id", targetUser.id)
+        .order("time", { ascending: true });
+
+      const { data: bio } = await supabase
+        .from("biomarkers")
+        .select("*")
+        .eq("user_id", targetUser.id)
+        .order("test_date", { ascending: true });
 
       setDocuments(docs || []);
       setMedications(meds || []);
       setReminders(rems || []);
       setBiomarkers(bio || []);
     } catch (err) {
-      console.error("Telemetry load error:", err);
+      console.error("Data load error:", err);
     }
   };
 
@@ -428,9 +457,12 @@ export default function HealthCopilotApp() {
     await supabase.auth.signOut();
     setSessionUser(null);
     setProfile(null);
+    setDocuments([]);
+    setMedications([]);
+    setReminders([]);
+    setBiomarkers([]);
   };
 
-  // Enforce Sign-in for File and Camera uploads
   const handleUploadClick = () => {
     if (!sessionUser) {
       alert(t.signInRequired);
@@ -494,7 +526,7 @@ export default function HealthCopilotApp() {
   };
 
   const handleConfirmSave = async () => {
-    if (!extractedData) return;
+    if (!extractedData || !sessionUser?.id) return;
 
     const isValidDate = (d: string) => d && /^\d{4}-\d{2}-\d{2}$/.test(d);
     const safeDate = isValidDate(extractedData.recordDate)
@@ -502,7 +534,8 @@ export default function HealthCopilotApp() {
       : new Date().toISOString().split("T")[0];
 
     try {
-      const docPayload: any = {
+      const docPayload = {
+        user_id: sessionUser.id,
         doc_type: extractedData.docType || "prescription",
         record_date: safeDate,
         doctor_name: extractedData.doctorName || "Attending Physician",
@@ -510,85 +543,54 @@ export default function HealthCopilotApp() {
         technical_summary: extractedData.technicalSummary || "",
         questions: extractedData.questionsForDoctor || []
       };
-      if (sessionUser?.id) {
-        docPayload.user_id = sessionUser.id;
-      }
 
-      let { data: docData, error: docErr } = await supabase
+      const { data: docData, error: docErr } = await supabase
         .from("documents")
         .insert([docPayload])
         .select()
         .single();
 
-      if (docErr && docErr.message?.includes("user_id")) {
-        delete docPayload.user_id;
-        const retry = await supabase
-          .from("documents")
-          .insert([docPayload])
-          .select()
-          .single();
-        docData = retry.data;
-        docErr = retry.error;
-      }
-
       if (docErr) throw docErr;
 
       if (extractedData.biomarkers?.length > 0 && docData?.id) {
-        const markerInserts = extractedData.biomarkers.map((b: any) => {
-          const item: any = {
-            document_id: docData.id,
-            marker_name: b.markerName,
-            value: Number(b.value) || 0,
-            unit: b.unit || "",
-            status: b.status || "normal",
-            test_date: safeDate
-          };
-          if (sessionUser?.id) item.user_id = sessionUser.id;
-          return item;
-        });
+        const markerInserts = extractedData.biomarkers.map((b: any) => ({
+          user_id: sessionUser.id,
+          document_id: docData.id,
+          marker_name: b.markerName,
+          value: Number(b.value) || 0,
+          unit: b.unit || "",
+          status: b.status || "normal",
+          test_date: safeDate
+        }));
 
         const { error: bioErr } = await supabase.from("biomarkers").insert(markerInserts);
-        if (bioErr && bioErr.message?.includes("user_id")) {
-          const fallbackMarkers = markerInserts.map(({ user_id, ...rest }: any) => rest);
-          await supabase.from("biomarkers").insert(fallbackMarkers);
-        }
+        if (bioErr) console.warn("Biomarker error:", bioErr);
       }
 
       if (extractedData.medications?.length > 0) {
-        const medInserts = extractedData.medications.map((m: any) => {
-          const item: any = {
-            name: m.name,
-            dosage: m.dosage || "As advised",
-            frequency: m.frequency || "Daily",
-            duration: m.duration || "30 days",
-            status: m.actionType === "discontinued" ? "discontinued" : "active"
-          };
-          if (sessionUser?.id) item.user_id = sessionUser.id;
-          return item;
-        });
+        const medInserts = extractedData.medications.map((m: any) => ({
+          user_id: sessionUser.id,
+          name: m.name,
+          dosage: m.dosage || "As advised",
+          frequency: m.frequency || "Daily",
+          duration: m.duration || "30 days",
+          status: m.actionType === "discontinued" ? "discontinued" : "active"
+        }));
 
         const { error: medErr } = await supabase.from("medications").insert(medInserts);
-        if (medErr && medErr.message?.includes("user_id")) {
-          const fallbackMeds = medInserts.map(({ user_id, ...rest }: any) => rest);
-          await supabase.from("medications").insert(fallbackMeds);
-        }
+        if (medErr) console.warn("Medication error:", medErr);
       }
 
-      const auditPayload: any = {
+      const auditPayload = {
+        user_id: sessionUser.id,
         action: "CLINICAL_DOCUMENT_SUMMARY_COMMITTED",
         resource: extractedData.docType || "prescription"
       };
-      if (sessionUser?.id) auditPayload.user_id = sessionUser.id;
-      
-      const { error: auditErr } = await supabase.from("audit_logs").insert([auditPayload]);
-      if (auditErr && auditErr.message?.includes("user_id")) {
-        delete auditPayload.user_id;
-        await supabase.from("audit_logs").insert([auditPayload]);
-      }
+      await supabase.from("audit_logs").insert([auditPayload]);
 
       setShowConfirmModal(false);
       setExtractedData(null);
-      await fetchDashboardData();
+      await fetchDashboardData(sessionUser);
     } catch (err: any) {
       alert("Save error: " + err.message);
     }
@@ -607,7 +609,7 @@ export default function HealthCopilotApp() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userText, language: selectedLang }),
+        body: JSON.stringify({ message: userText, language: selectedLang, userId: sessionUser?.id }),
       });
       const data = await res.json();
 
@@ -620,7 +622,7 @@ export default function HealthCopilotApp() {
         ]);
       }
 
-      if (data.actionTaken) fetchDashboardData();
+      if (data.actionTaken) fetchDashboardData(sessionUser);
     } catch (err: any) {
       setChatMessages(prev => [...prev, { role: "copilot", text: "Connection error: " + err.message }]);
     } finally {
@@ -641,7 +643,7 @@ export default function HealthCopilotApp() {
         try {
           recognitionRef.current.abort();
         } catch (e) {
-          console.warn("Speech abort error:", e);
+          console.warn("Speech error:", e);
         }
       }
       setIsListening(false);
@@ -676,7 +678,7 @@ export default function HealthCopilotApp() {
 
   const toggleReminder = async (id: string, current: boolean) => {
     await supabase.from("reminders").update({ completed: !current }).eq("id", id);
-    fetchDashboardData();
+    fetchDashboardData(sessionUser);
   };
 
   const trendData = biomarkers
@@ -684,92 +686,88 @@ export default function HealthCopilotApp() {
     .map(b => ({ date: b.test_date, value: Number(b.value) }));
 
   const navItems = [
-    { id: "overview", label: t.nav.radar, icon: Activity, badge: "Live" },
+    { id: "overview", label: t.nav.radar, icon: Activity, badge: `${documents.length}` },
     { id: "timeline", label: t.nav.ledger, icon: Calendar, badge: `${documents.length}` },
     { id: "medications", label: t.nav.regimens, icon: Pill, badge: `${medications.filter(m => m.status === "active").length}` },
     { id: "trends", label: t.nav.trends, icon: TrendingUp, badge: "Charts" },
-    { id: "doctor-prep", label: t.nav.dossier, icon: Printer, badge: "Printable" },
+    { id: "doctor-prep", label: t.nav.dossier, icon: Printer, badge: "Brief" },
     { id: "chat", label: t.nav.agent, icon: MessageSquare, badge: "AI" },
   ];
 
   return (
-    <div className="min-h-screen bg-[#030712] text-neutral-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200 antialiased relative overflow-x-hidden pb-12">
-      <div className="fixed top-[-20%] left-[20%] w-[800px] h-[500px] rounded-full bg-cyan-600/[0.07] blur-[160px] pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-5%] w-[700px] h-[600px] rounded-full bg-emerald-600/[0.05] blur-[180px] pointer-events-none" />
-
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900 antialiased pb-12">
+      {/* Adherence Alert Banner */}
       {activeAlarm && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#0B0F1D]/90 backdrop-blur-2xl border border-amber-500/50 text-white px-6 py-3.5 rounded-full shadow-[0_0_50px_rgba(245,158,11,0.3)] flex items-center space-x-4 animate-in fade-in duration-300">
-          <div className="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-            <BellRing className="w-4 h-4 animate-pulse" />
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-white border border-amber-300 text-slate-800 px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-4 animate-in fade-in">
+          <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-600">
+            <BellRing className="w-4 h-4 animate-bounce" />
           </div>
           <div>
-            <div className="text-[10px] uppercase font-mono tracking-widest text-amber-400 font-bold">Medicine Alert</div>
-            <div className="text-xs font-semibold text-neutral-100">{activeAlarm.title} &bull; <span className="text-amber-300">{activeAlarm.time}</span></div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Medicine Alert</div>
+            <div className="text-xs font-semibold text-slate-800">{activeAlarm.title} &bull; <span className="text-amber-700 font-bold">{activeAlarm.time}</span></div>
           </div>
           <button
             onClick={() => {
               toggleReminder(activeAlarm.id, false);
               setActiveAlarm(null);
             }}
-            className="bg-amber-500 hover:bg-amber-400 text-neutral-950 px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm cursor-pointer"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm cursor-pointer"
           >
             I took it
           </button>
         </div>
       )}
 
-      {/* Header Bar */}
-      <header className="h-18 px-8 border-b border-white/[0.07] bg-[#070B16]/80 backdrop-blur-2xl flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-emerald-500 to-indigo-600 p-[1px] shadow-[0_0_25px_rgba(6,182,212,0.3)]">
-              <div className="w-full h-full bg-[#030712] rounded-2xl flex items-center justify-center">
-                <Heart className="w-5 h-5 text-cyan-400 animate-pulse" />
-              </div>
-            </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#030712]" />
+      {/* Clean White Top Navigation Header */}
+      <header className="h-16 px-6 sm:px-8 border-b border-slate-200 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-40 shadow-xs">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+            <Heart className="w-5 h-5 fill-current" />
           </div>
-
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-extrabold text-sm tracking-tight text-white uppercase">{t.appTitle}</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold tracking-wider">{t.edition}</span>
+              <span className="font-extrabold text-base tracking-tight text-slate-900">{t.appTitle}</span>
+              <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                {t.edition}
+              </span>
             </div>
-            <div className="flex items-center space-x-2 text-[11px] text-neutral-400 font-mono">
-              <span className="text-emerald-400 font-bold">&bull; {t.telemetryLive}</span>
-              <span>&mdash;</span>
+            <div className="flex items-center space-x-2 text-[11px] text-slate-500">
+              <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> {t.telemetryLive}
+              </span>
+              <span>&bull;</span>
               <span>{t.abdmReady}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
-          {/* Multi-Language Selector */}
-          <div className="flex bg-white/[0.04] border border-white/[0.08] rounded-xl p-0.5 text-xs font-mono">
+        <div className="flex items-center space-x-2.5">
+          {/* Language Switcher */}
+          <div className="flex bg-slate-100 border border-slate-200 rounded-lg p-0.5 text-xs font-medium">
             <button 
               onClick={() => setSelectedLang("en")} 
-              className={`px-2.5 py-1 rounded-lg transition cursor-pointer font-semibold ${selectedLang === "en" ? "bg-cyan-500 text-black font-bold" : "text-neutral-400 hover:text-white"}`}
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer ${selectedLang === "en" ? "bg-white text-emerald-800 font-bold shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
             >
               EN
             </button>
             <button 
               onClick={() => setSelectedLang("te")} 
-              className={`px-2.5 py-1 rounded-lg transition cursor-pointer font-semibold ${selectedLang === "te" ? "bg-cyan-500 text-black font-bold" : "text-neutral-400 hover:text-white"}`}
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer ${selectedLang === "te" ? "bg-white text-emerald-800 font-bold shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
             >
               తెలుగు
             </button>
             <button 
               onClick={() => setSelectedLang("hi")} 
-              className={`px-2.5 py-1 rounded-lg transition cursor-pointer font-semibold ${selectedLang === "hi" ? "bg-cyan-500 text-black font-bold" : "text-neutral-400 hover:text-white"}`}
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer ${selectedLang === "hi" ? "bg-white text-emerald-800 font-bold shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
             >
               हिन्दी
             </button>
           </div>
 
-          {/* ABDM Modal Trigger */}
+          {/* ABHA Gateway */}
           <button
             onClick={() => setShowAbhaModal(true)}
-            className="flex items-center space-x-1.5 text-xs font-mono text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 px-3 py-1.5 rounded-xl transition cursor-pointer"
+            className="hidden sm:flex items-center space-x-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition cursor-pointer"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>ABHA & FHIR</span>
@@ -777,22 +775,23 @@ export default function HealthCopilotApp() {
 
           <button 
             onClick={playAlarmSound}
-            className="flex items-center space-x-1.5 text-xs text-neutral-300 bg-white/[0.03] hover:bg-white/[0.08] px-3.5 py-2 rounded-xl border border-white/[0.08] transition cursor-pointer"
+            className="flex items-center space-x-1.5 text-xs text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 transition cursor-pointer"
+            title="Test alert notification chime"
           >
-            <Bell className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="font-mono text-[11px]">{t.sirenTest}</span>
+            <Bell className="w-3.5 h-3.5 text-slate-500" />
+            <span className="hidden md:inline">{t.sirenTest}</span>
           </button>
 
-          {/* 1. Camera Snap Button */}
+          {/* Camera Scan Action */}
           <button
             type="button"
             onClick={handleCameraClick}
             disabled={uploading}
-            className="flex items-center space-x-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold px-3 py-2 rounded-xl text-xs cursor-pointer transition disabled:opacity-50"
-            title="Take a photo with your device camera"
+            className="flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition disabled:opacity-50"
+            title="Snap prescription photo"
           >
-            <Camera className="w-4 h-4" />
-            <span>{uploading ? "..." : t.cameraBtn}</span>
+            <Camera className="w-4 h-4 text-emerald-600" />
+            <span className="hidden md:inline">{uploading ? "..." : t.cameraBtn}</span>
           </button>
           <input 
             ref={cameraInputRef}
@@ -804,12 +803,12 @@ export default function HealthCopilotApp() {
             className="hidden" 
           />
 
-          {/* 2. File / PDF Upload Button */}
+          {/* Primary Upload Button */}
           <button
             type="button"
             onClick={handleUploadClick}
             disabled={uploading}
-            className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-neutral-950 font-bold px-3.5 py-2 rounded-xl text-xs cursor-pointer transition shadow-[0_0_25px_rgba(6,182,212,0.3)] disabled:opacity-50"
+            className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs cursor-pointer transition shadow-xs disabled:opacity-50"
           >
             <UploadCloud className="w-4 h-4" />
             <span>{uploading ? t.ingesting : t.ingestBtn}</span>
@@ -823,25 +822,25 @@ export default function HealthCopilotApp() {
             className="hidden" 
           />
 
-          <div className="h-6 w-px bg-white/[0.08] mx-1" />
+          <div className="h-6 w-px bg-slate-200 mx-1" />
 
-          {/* User Auth Capsule */}
+          {/* User Status Profile */}
           {sessionUser ? (
-            <div className="flex items-center space-x-3 bg-white/[0.03] border border-white/[0.08] px-3.5 py-1.5 rounded-xl backdrop-blur-md">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center text-xs font-bold text-cyan-300">
+            <div className="flex items-center space-x-2.5 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg">
+              <div className="w-7 h-7 rounded-md bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">
                 {profile?.name ? profile.name[0].toUpperCase() : sessionUser.email[0].toUpperCase()}
               </div>
-              <div className="text-left">
-                <div className="text-xs font-semibold text-white leading-tight truncate max-w-[120px]">
+              <div className="text-left hidden sm:block">
+                <div className="text-xs font-semibold text-slate-800 leading-tight truncate max-w-[110px]">
                   {profile?.name || sessionUser.email}
                 </div>
-                <div className="text-[10px] text-cyan-400 font-mono tracking-wider">
-                  {profile?.blood_group ? `TYPE ${profile.blood_group}` : t.verifiedStatus}
+                <div className="text-[10px] text-emerald-700 font-medium">
+                  {profile?.blood_group ? `Type ${profile.blood_group}` : t.verifiedStatus}
                 </div>
               </div>
               <button
                 onClick={handleSignOut}
-                className="p-1 rounded-lg hover:bg-white/10 text-neutral-400 hover:text-red-400 transition cursor-pointer"
+                className="p-1 rounded-md hover:bg-slate-200 text-slate-500 hover:text-rose-600 transition cursor-pointer"
                 title={t.signOut}
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -850,7 +849,7 @@ export default function HealthCopilotApp() {
           ) : (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="flex items-center space-x-2 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-cyan-300 font-mono px-3.5 py-2 rounded-xl text-xs transition cursor-pointer"
+              className="flex items-center space-x-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-semibold px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span>{t.signInUp}</span>
@@ -861,10 +860,10 @@ export default function HealthCopilotApp() {
 
       {/* Main Workspace Frame */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Navigation Rail */}
-        <aside className="w-68 border-r border-white/[0.06] bg-[#070B16]/50 p-4 flex flex-col justify-between">
-          <nav className="space-y-1.5">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 px-3 mb-2 font-bold">{t.menuHeader}</div>
+        {/* Navigation Sidebar */}
+        <aside className="w-64 border-r border-slate-200 bg-white p-4 flex flex-col justify-between shrink-0 shadow-xs">
+          <nav className="space-y-1">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">{t.menuHeader}</div>
             {navItems.map(item => {
               const Icon = item.icon;
               const active = activeTab === item.id;
@@ -872,18 +871,18 @@ export default function HealthCopilotApp() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id as any)}
-                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-medium transition cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition cursor-pointer ${
                     active 
-                      ? "bg-gradient-to-r from-cyan-500/15 via-emerald-500/10 to-transparent text-cyan-300 border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.1)]" 
-                      : "text-neutral-400 hover:text-white hover:bg-white/[0.03] border border-transparent"
+                      ? "bg-emerald-50 text-emerald-900 font-semibold border border-emerald-200 shadow-xs" 
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent"
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <Icon className={`w-4 h-4 transition ${active ? "text-cyan-400" : "text-neutral-500"}`} />
-                    <span className="font-semibold">{item.label}</span>
+                    <Icon className={`w-4 h-4 ${active ? "text-emerald-700" : "text-slate-400"}`} />
+                    <span>{item.label}</span>
                   </div>
-                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-                    active ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/30" : "bg-white/[0.03] text-neutral-500 border-white/[0.05]"
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                    active ? "bg-emerald-200/60 text-emerald-900 border-emerald-300" : "bg-slate-100 text-slate-500 border-slate-200"
                   }`}>
                     {item.badge}
                   </span>
@@ -892,118 +891,120 @@ export default function HealthCopilotApp() {
             })}
           </nav>
 
-          <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-xs text-neutral-300 space-y-2 backdrop-blur-md">
-            <div className="flex items-center space-x-2 text-emerald-400 font-bold">
-              <ShieldCheck className="w-4 h-4" />
-              <span className="font-mono text-[11px] tracking-wider uppercase">{t.groundedSafeguard}</span>
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+            <div className="flex items-center space-x-1.5 text-emerald-800 font-bold">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span className="text-[11px] uppercase tracking-wider">{t.groundedSafeguard}</span>
             </div>
-            <p className="text-[11px] text-neutral-400 leading-relaxed font-sans">
+            <p className="text-[11px] text-slate-600 leading-relaxed">
               {t.safeguardDesc}
             </p>
           </div>
         </aside>
 
-        {/* Dynamic Canvas */}
-        <main className="flex-1 p-8 overflow-y-auto">
-          {/* TAB 1: OVERVIEW */}
+        {/* Dynamic Canvas Area */}
+        <main className="flex-1 p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+          {/* TAB 1: HEALTH OVERVIEW */}
           {activeTab === "overview" && (
-            <div className="max-w-6xl mx-auto space-y-7 animate-in fade-in duration-200">
+            <div className="space-y-6">
               {/* Telemetry Metric Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: t.metrics.docs, val: documents.length, desc: t.metrics.docsDesc, icon: FileText, border: "border-cyan-500/20", glow: "from-cyan-500/10 to-transparent", text: "text-cyan-400" },
-                  { label: t.metrics.regimens, val: medications.filter(m => m.status === "active").length, desc: t.metrics.regimensDesc, icon: Pill, border: "border-emerald-500/20", glow: "from-emerald-500/10 to-transparent", text: "text-emerald-400" },
-                  { label: t.metrics.markers, val: biomarkers.length, desc: t.metrics.markersDesc, icon: TrendingUp, border: "border-blue-500/20", glow: "from-blue-500/10 to-transparent", text: "text-blue-400" },
-                  { label: t.metrics.alarms, val: reminders.filter(r => !r.completed).length, desc: t.metrics.alarmsDesc, icon: Clock, border: "border-amber-500/20", glow: "from-amber-500/10 to-transparent", text: "text-amber-400" },
+                  { label: t.metrics.docs, val: documents.length, desc: t.metrics.docsDesc, icon: FileText },
+                  { label: t.metrics.regimens, val: medications.filter(m => m.status === "active").length, desc: t.metrics.regimensDesc, icon: Pill },
+                  { label: t.metrics.markers, val: biomarkers.length, desc: t.metrics.markersDesc, icon: TrendingUp },
+                  { label: t.metrics.alarms, val: reminders.filter(r => !r.completed).length, desc: t.metrics.alarmsDesc, icon: Clock },
                 ].map((c, i) => {
                   const Icon = c.icon;
                   return (
-                    <div key={i} className={`p-5 rounded-2xl bg-gradient-to-b ${c.glow} bg-[#0A0E1A]/80 border ${c.border} backdrop-blur-xl relative overflow-hidden group`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-[11px] font-mono uppercase tracking-wider text-neutral-400">{c.label}</span>
-                        <div className={`p-2 rounded-xl bg-white/[0.04] border border-white/[0.08] ${c.text}`}>
+                    <div key={i} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+                      <div className="flex justify-between items-start">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{c.label}</span>
+                        <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
                           <Icon className="w-4 h-4" />
                         </div>
                       </div>
-                      <div className="text-3xl font-extrabold text-white tracking-tight">{c.val}</div>
-                      <div className="text-[11px] text-neutral-400 mt-1 font-mono">{c.desc}</div>
+                      <div className="mt-3">
+                        <div className="text-3xl font-extrabold text-slate-900 tracking-tight">{c.val}</div>
+                        <div className="text-xs text-slate-500 mt-1">{c.desc}</div>
+                      </div>
                     </div>
                   );
                 })}
               </div>
 
-              {/* ABDM Official NHA Banner Card */}
+              {/* ABDM Banner Card */}
               <div 
                 onClick={() => setShowAbhaModal(true)}
-                className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950/20 via-[#0A101D] to-cyan-950/20 border border-emerald-500/30 hover:border-emerald-400/50 backdrop-blur-xl transition cursor-pointer flex items-center justify-between group shadow-[0_0_30px_rgba(16,185,129,0.06)]"
+                className="p-5 rounded-2xl bg-white border border-emerald-200 hover:border-emerald-300 transition cursor-pointer flex items-center justify-between shadow-xs group"
               >
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
                     <Building2 className="w-6 h-6" />
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <h4 className="text-sm font-bold text-white tracking-tight">
+                      <h4 className="text-sm font-bold text-slate-900">
                         {t.abdmBannerTitle}
                       </h4>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                         {t.abdmBannerTag}
                       </span>
                     </div>
-                    <p className="text-xs text-neutral-300 mt-1 font-sans max-w-2xl leading-relaxed">
+                    <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
                       {t.abdmBannerDesc}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 text-emerald-400 text-xs font-bold font-mono pl-4 shrink-0">
+                <div className="flex items-center space-x-1.5 text-emerald-700 text-xs font-bold pl-4 shrink-0">
                   <span>{t.abdmConnectBtn}</span>
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
                 </div>
               </div>
 
-              {/* Feed: Clinical Summaries & Alarms */}
+              {/* Summaries & Reminders Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 rounded-3xl bg-[#0A0E1A]/60 border border-white/[0.08] p-6 backdrop-blur-2xl space-y-5">
-                  <div className="flex items-center justify-between">
+                <div className="lg:col-span-2 rounded-2xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div className="flex items-center space-x-2">
-                      <Sparkles className="w-4 h-4 text-cyan-400" />
-                      <h3 className="font-bold text-base text-white tracking-tight">{t.summariesTitle}</h3>
+                      <Sparkles className="w-4 h-4 text-emerald-600" />
+                      <h3 className="font-bold text-base text-slate-900">{t.summariesTitle}</h3>
                     </div>
-                    <button onClick={() => setActiveTab("timeline")} className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center space-x-1 cursor-pointer">
+                    <button onClick={() => setActiveTab("timeline")} className="text-xs text-emerald-700 hover:text-emerald-800 font-bold flex items-center space-x-1 cursor-pointer">
                       <span>{t.fullTimeline}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
                   {documents.length === 0 ? (
-                    <div className="p-10 text-center text-neutral-500 border border-dashed border-white/[0.08] rounded-2xl text-xs font-mono">
+                    <div className="p-8 text-center text-slate-500 border border-dashed border-slate-200 rounded-xl text-xs">
                       {t.noDocs}
                     </div>
                   ) : (
-                    <div className="space-y-3.5">
+                    <div className="space-y-3">
                       {documents.slice(0, 3).map((doc, idx) => (
-                        <div key={idx} className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-cyan-500/30 transition space-y-3">
+                        <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-300 transition space-y-2">
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center space-x-2">
-                              <span className="font-mono text-[10px] uppercase font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">
+                              <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200">
                                 {doc.doc_type}
                               </span>
-                              <span className="text-neutral-400 font-mono text-[11px]">
+                              <span className="text-slate-500 text-[11px] font-medium">
                                 {doc.record_date}
                               </span>
                             </div>
                             {doc.doctor_name && (
-                              <span className="text-neutral-400 font-mono text-[11px] truncate max-w-[150px]">
+                              <span className="text-slate-600 font-medium text-[11px] truncate max-w-[180px]">
                                 {doc.doctor_name}
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-neutral-200 leading-relaxed font-sans">
+                          <p className="text-xs text-slate-700 leading-relaxed">
                             {doc.plain_summary}
                           </p>
                           {doc.questions && doc.questions.length > 0 && (
-                            <div className="pt-2 border-t border-white/[0.04] text-[11px] text-cyan-300 font-sans flex items-center space-x-1.5">
-                              <span className="font-mono font-bold text-[10px] text-cyan-400 uppercase">Suggested Question:</span>
+                            <div className="pt-2 border-t border-slate-200/60 text-[11px] text-emerald-800 flex items-center space-x-1.5">
+                              <span className="font-bold text-[10px] uppercase text-emerald-700">Question:</span>
                               <span className="truncate">{doc.questions[0]}</span>
                             </div>
                           )}
@@ -1013,42 +1014,42 @@ export default function HealthCopilotApp() {
                   )}
                 </div>
 
-                {/* Schedules & Alarms */}
-                <div className="rounded-3xl bg-[#0A0E1A]/60 border border-white/[0.08] p-6 backdrop-blur-2xl space-y-5">
-                  <div className="flex items-center justify-between">
+                {/* Daily Reminders */}
+                <div className="rounded-2xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-amber-400" />
-                      <h3 className="font-bold text-base text-white tracking-tight">{t.dailyAlarms}</h3>
+                      <Clock className="w-4 h-4 text-emerald-600" />
+                      <h3 className="font-bold text-base text-slate-900">{t.dailyAlarms}</h3>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20 font-bold">{t.armed}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">{t.armed}</span>
                   </div>
 
                   {reminders.length === 0 ? (
-                    <div className="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-white/[0.08] rounded-2xl">
+                    <div className="p-8 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl">
                       {t.noReminders}
                     </div>
                   ) : (
-                    <div className="space-y-2.5">
+                    <div className="space-y-2">
                       {reminders.map((r, i) => (
                         <div 
                           key={i} 
                           onClick={() => toggleReminder(r.id, r.completed)}
-                          className={`p-3.5 rounded-2xl border text-xs flex items-center justify-between cursor-pointer transition ${
+                          className={`p-3 rounded-xl border text-xs flex items-center justify-between cursor-pointer transition ${
                             r.completed 
-                              ? "bg-white/[0.01] border-white/5 line-through text-neutral-500" 
-                              : "bg-white/[0.03] border-white/[0.08] hover:border-cyan-500/40 text-neutral-200"
+                              ? "bg-slate-50 border-slate-200 line-through text-slate-400" 
+                              : "bg-white border-slate-200 hover:border-emerald-300 text-slate-800"
                           }`}
                         >
-                          <div className="flex items-center space-x-3">
-                            <div className={`p-1.5 rounded-xl ${r.completed ? "bg-white/5 text-neutral-600" : "bg-amber-400/10 text-amber-400"}`}>
+                          <div className="flex items-center space-x-2.5">
+                            <div className={`p-1.5 rounded-lg ${r.completed ? "bg-slate-100 text-slate-400" : "bg-emerald-50 text-emerald-700"}`}>
                               <Bell className="w-3.5 h-3.5" />
                             </div>
                             <div>
-                              <p className="font-semibold text-neutral-100">{r.title}</p>
-                              <span className="text-[10px] font-mono text-neutral-400">{r.time}</span>
+                              <p className="font-semibold text-slate-900">{r.title}</p>
+                              <span className="text-[11px] text-slate-500">{r.time}</span>
                             </div>
                           </div>
-                          <CheckCircle2 className={`w-4 h-4 transition ${r.completed ? "text-emerald-500" : "text-neutral-600 hover:text-neutral-400"}`} />
+                          <CheckCircle2 className={`w-4 h-4 ${r.completed ? "text-emerald-600" : "text-slate-300 hover:text-slate-400"}`} />
                         </div>
                       ))}
                     </div>
@@ -1062,55 +1063,67 @@ export default function HealthCopilotApp() {
           {activeTab === "timeline" && (
             <div className="max-w-4xl mx-auto space-y-6">
               <div>
-                <h2 className="text-xl font-extrabold text-white tracking-tight">{t.timelineHeader}</h2>
-                <p className="text-xs text-neutral-400 mt-1">{t.timelineSub}</p>
+                <h2 className="text-xl font-extrabold text-slate-900">{t.timelineHeader}</h2>
+                <p className="text-xs text-slate-500 mt-1">{t.timelineSub}</p>
               </div>
 
-              <div className="relative border-l border-white/[0.08] ml-4 pl-6 space-y-6">
-                {documents.map((doc, i) => (
-                  <div key={i} className="relative group">
-                    <div className="absolute -left-[31px] top-2 w-3.5 h-3.5 rounded-full bg-cyan-400 border-4 border-[#030712] shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
-                    <div className="p-5 rounded-2xl bg-[#0A0E1A]/80 border border-white/[0.08] hover:border-cyan-500/40 backdrop-blur-xl transition space-y-3">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                          {doc.doc_type}
-                        </span>
-                        <span className="text-neutral-400 font-mono text-[11px]">{doc.record_date}</span>
+              {documents.length === 0 ? (
+                <div className="p-10 text-center text-slate-500 border border-dashed border-slate-200 rounded-2xl text-xs bg-white">
+                  {t.noDocs}
+                </div>
+              ) : (
+                <div className="relative border-l-2 border-emerald-200 ml-4 pl-6 space-y-6">
+                  {documents.map((doc, i) => (
+                    <div key={i} className="relative">
+                      <div className="absolute -left-[31px] top-2 w-3.5 h-3.5 rounded-full bg-emerald-600 border-4 border-white shadow-xs" />
+                      <div className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-emerald-300 shadow-xs transition space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            {doc.doc_type}
+                          </span>
+                          <span className="text-slate-500 text-[11px] font-medium">{doc.record_date}</span>
+                        </div>
+                        <h4 className="font-bold text-sm text-slate-900">{doc.doctor_name || "Diagnostic Finding"}</h4>
+                        <p className="text-xs text-slate-600 leading-relaxed">{doc.plain_summary}</p>
                       </div>
-                      <h4 className="font-bold text-sm text-white">{doc.doctor_name || "Diagnostic Finding"}</h4>
-                      <p className="text-xs text-neutral-300 leading-relaxed font-sans">{doc.plain_summary}</p>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {/* TAB 3: MY MEDICINES */}
+          {/* TAB 3: ACTIVE MEDICINES */}
           {activeTab === "medications" && (
             <div className="max-w-4xl mx-auto space-y-6">
               <div>
-                <h2 className="text-xl font-extrabold text-white tracking-tight">{t.regimensHeader}</h2>
-                <p className="text-xs text-neutral-400 mt-1">{t.regimensSub}</p>
+                <h2 className="text-xl font-extrabold text-slate-900">{t.regimensHeader}</h2>
+                <p className="text-xs text-slate-500 mt-1">{t.regimensSub}</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {medications.map((m, idx) => (
-                  <div key={idx} className="p-5 rounded-2xl bg-[#0A0E1A]/80 border border-white/[0.08] backdrop-blur-xl space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-white">{m.name}</span>
-                      <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        {m.status}
-                      </span>
+              {medications.length === 0 ? (
+                <div className="p-10 text-center text-slate-500 border border-dashed border-slate-200 rounded-2xl text-xs bg-white">
+                  No active medicines recorded yet. Upload a prescription to automatically extract your medicines.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {medications.map((m, idx) => (
+                    <div key={idx} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sm text-slate-900">{m.name}</span>
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          {m.status}
+                        </span>
+                      </div>
+                      <div className="space-y-1 text-xs text-slate-600">
+                        <div><strong className="text-slate-800">{t.dosage}:</strong> {m.dosage}</div>
+                        <div><strong className="text-slate-800">{t.schedule}:</strong> {m.frequency}</div>
+                        {m.duration && <div><strong className="text-slate-800">{t.duration}:</strong> {m.duration}</div>}
+                      </div>
                     </div>
-                    <div className="space-y-1.5 text-xs text-neutral-300 font-sans">
-                      <div><strong className="text-neutral-400">{t.dosage}:</strong> {m.dosage}</div>
-                      <div><strong className="text-neutral-400">{t.schedule}:</strong> {m.frequency}</div>
-                      {m.duration && <div><strong className="text-neutral-400">{t.duration}:</strong> {m.duration}</div>}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -1119,22 +1132,22 @@ export default function HealthCopilotApp() {
             <div className="max-w-4xl mx-auto space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-extrabold text-white tracking-tight">{t.trendsHeader}</h2>
-                  <p className="text-xs text-neutral-400 mt-1">{t.trendsSub}</p>
+                  <h2 className="text-xl font-extrabold text-slate-900">{t.trendsHeader}</h2>
+                  <p className="text-xs text-slate-500 mt-1">{t.trendsSub}</p>
                 </div>
                 <input 
                   type="text" 
                   value={selectedMarker} 
-                  onChange={(e) => setSelectedMarker(e.target.value)}
+                  onChange={(e) => setSelectedMarker(e.target.value)} 
                   placeholder={t.filterPlaceholder}
-                  className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] text-xs text-neutral-200 focus:outline-none focus:border-cyan-500 font-mono"
+                  className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-emerald-500 shadow-xs"
                 />
               </div>
 
-              <div className="p-6 rounded-3xl bg-[#0A0E1A]/80 border border-white/[0.08] backdrop-blur-xl space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white font-mono uppercase">{selectedMarker} Progress</h3>
-                  <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">Graph</span>
+              <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="text-sm font-bold text-slate-900 uppercase">{selectedMarker} Progression</h3>
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Chart</span>
                 </div>
 
                 {trendData.length > 1 ? (
@@ -1142,22 +1155,22 @@ export default function HealthCopilotApp() {
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={trendData}>
                         <defs>
-                          <linearGradient id="auraCyanGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4}/>
-                            <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                          <linearGradient id="emeraldGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#059669" stopOpacity={0.25}/>
+                            <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <XAxis dataKey="date" stroke="#475569" fontSize={11} />
-                        <YAxis stroke="#475569" fontSize={11} />
+                        <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} />
+                        <YAxis stroke="#94a3b8" fontSize={11} />
                         <Tooltip 
-                          contentStyle={{ backgroundColor: "#070B16", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", fontSize: "12px" }}
+                          contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
                         />
-                        <Area type="monotone" dataKey="value" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#auraCyanGrad)" />
+                        <Area type="monotone" dataKey="value" stroke="#059669" strokeWidth={2.5} fillOpacity={1} fill="url(#emeraldGrad)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="p-12 text-center text-xs text-neutral-500 border border-dashed border-white/[0.08] rounded-2xl font-mono">
+                  <div className="p-12 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl">
                     {t.needMorePoints}
                   </div>
                 )}
@@ -1165,39 +1178,43 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 5: DOCTOR VISIT SUMMARY */}
+          {/* TAB 5: DOCTOR SUMMARY */}
           {activeTab === "doctor-prep" && (
-            <div className="max-w-3xl mx-auto rounded-3xl bg-[#0A0E1A]/80 border border-white/[0.08] p-8 backdrop-blur-xl space-y-6">
-              <div className="flex justify-between items-start border-b border-white/[0.08] pb-5">
+            <div className="max-w-3xl mx-auto rounded-2xl bg-white border border-slate-200 p-8 shadow-xs space-y-6">
+              <div className="flex justify-between items-start border-b border-slate-100 pb-5">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-white tracking-tight">{t.dossierHeader}</h2>
-                  <p className="text-xs text-neutral-400 mt-1">{t.dossierSub}</p>
+                  <h2 className="text-2xl font-extrabold text-slate-900">{t.dossierHeader}</h2>
+                  <p className="text-xs text-slate-500 mt-1">{t.dossierSub}</p>
                 </div>
-                <button onClick={() => window.print()} className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
-                  <Printer className="w-4 h-4 text-cyan-400" />
+                <button onClick={() => window.print()} className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs">
+                  <Printer className="w-4 h-4" />
                   <span>{t.printBrief}</span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 bg-white/[0.02] border border-white/[0.05] p-4 rounded-2xl text-xs font-sans">
-                <div><span className="text-neutral-400">{t.patient}:</span> <strong className="text-white">{profile?.name || "Not signed in"}</strong></div>
-                <div><span className="text-neutral-400">{t.age}:</span> <strong className="text-white">{profile?.age || "--"}</strong></div>
-                <div><span className="text-neutral-400">{t.bloodGroup}:</span> <strong className="text-white">{profile?.blood_group || "--"}</strong></div>
-                <div><span className="text-neutral-400">{t.allergies}:</span> <strong className="text-white">{profile?.allergies?.join(", ") || "None"}</strong></div>
+              <div className="grid grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-4 rounded-xl text-xs">
+                <div><span className="text-slate-500">{t.patient}:</span> <strong className="text-slate-900">{profile?.name || "Not signed in"}</strong></div>
+                <div><span className="text-slate-500">{t.age}:</span> <strong className="text-slate-900">{profile?.age || "--"}</strong></div>
+                <div><span className="text-slate-500">{t.bloodGroup}:</span> <strong className="text-slate-900">{profile?.blood_group || "--"}</strong></div>
+                <div><span className="text-slate-500">{t.allergies}:</span> <strong className="text-slate-900">{profile?.allergies?.join(", ") || "None"}</strong></div>
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-xs font-mono uppercase tracking-wider text-neutral-400">{t.currentRegimens}</h4>
-                <ul className="list-disc pl-5 text-xs space-y-1 text-neutral-200">
-                  {medications.map((m, i) => (
-                    <li key={i}>{m.name} — {m.dosage} ({m.frequency})</li>
-                  ))}
-                </ul>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">{t.currentRegimens}</h4>
+                {medications.length === 0 ? (
+                  <p className="text-xs text-slate-500">No active medications registered.</p>
+                ) : (
+                  <ul className="list-disc pl-5 text-xs space-y-1 text-slate-700">
+                    {medications.map((m, i) => (
+                      <li key={i}>{m.name} — {m.dosage} ({m.frequency})</li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
-              <div className="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/20 space-y-2">
-                <h4 className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">{t.suggestedQuestions}</h4>
-                <ul className="list-disc pl-5 text-xs text-neutral-300 space-y-1">
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800">{t.suggestedQuestions}</h4>
+                <ul className="list-disc pl-5 text-xs text-slate-700 space-y-1">
                   {documents[0]?.questions?.map((q: string, i: number) => <li key={i}>{q}</li>) || (
                     <li>Inquire about the duration and tapering of active therapies.</li>
                   )}
@@ -1206,29 +1223,29 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 6: AI HEALTH ASSISTANT (Chat without voice audio or speech buttons) */}
+          {/* TAB 6: AI CLINICAL COPILOT */}
           {activeTab === "chat" && (
-            <div className="max-w-3xl mx-auto h-[calc(100vh-160px)] flex flex-col rounded-3xl bg-[#0A0E1A]/80 border border-white/[0.08] overflow-hidden backdrop-blur-xl shadow-2xl">
-              <div className="p-4 border-b border-white/[0.06] flex items-center justify-between bg-white/[0.02]">
+            <div className="max-w-3xl mx-auto h-[calc(100vh-140px)] flex flex-col rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-xs">
+              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span className="font-bold text-xs text-white">{t.agentTitle}</span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="font-bold text-xs text-slate-900">{t.agentTitle}</span>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 uppercase">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
                   {selectedLang === "te" ? "తెలుగు" : selectedLang === "hi" ? "हिन्दी" : "English"}
                 </span>
               </div>
 
-              <div className="flex-1 p-5 overflow-y-auto space-y-4">
+              <div className="flex-1 p-5 overflow-y-auto space-y-3.5">
                 {chatMessages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] p-4 rounded-2xl text-xs leading-relaxed ${
+                    <div className={`max-w-[80%] p-3.5 rounded-2xl text-xs leading-relaxed ${
                       msg.role === "user" 
-                        ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-br-none shadow-[0_0_20px_rgba(6,182,212,0.25)]" 
-                        : "bg-white/[0.04] border border-white/[0.06] text-neutral-200 rounded-bl-none font-sans"
+                        ? "bg-emerald-600 text-white rounded-br-none shadow-xs" 
+                        : "bg-slate-100 border border-slate-200 text-slate-800 rounded-bl-none"
                     }`}>
                       {msg.action && (
-                        <div className="text-[10px] font-mono font-bold text-cyan-400 mb-1">
+                        <div className="text-[10px] font-bold text-emerald-800 mb-1">
                           [Action: {msg.action}]
                         </div>
                       )}
@@ -1238,35 +1255,36 @@ export default function HealthCopilotApp() {
                 ))}
                 {chatLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white/[0.04] border border-white/[0.06] p-3 rounded-2xl text-xs text-neutral-400 flex items-center space-x-2">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" />
+                    <div className="bg-slate-100 border border-slate-200 p-3 rounded-2xl text-xs text-slate-500 flex items-center space-x-2">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600" />
                       <span>{t.formulating}</span>
                     </div>
                   </div>
                 )}
               </div>
 
-              <form onSubmit={handleSendMessage} className="p-4 border-t border-white/[0.06] flex items-center space-x-3 bg-white/[0.02]">
+              <form onSubmit={handleSendMessage} className="p-3.5 border-t border-slate-100 flex items-center space-x-2 bg-slate-50">
                 <button
                   type="button"
                   onClick={toggleVoiceInput}
                   className={`p-2.5 rounded-xl border transition cursor-pointer ${
-                    isListening ? "bg-red-500/20 text-red-400 border-red-500/40 animate-pulse" : "text-neutral-400 hover:text-white border-white/[0.08] hover:bg-white/[0.04]"
+                    isListening ? "bg-rose-50 text-rose-600 border-rose-300 animate-pulse" : "text-slate-500 hover:text-slate-800 border-slate-200 hover:bg-slate-200"
                   }`}
+                  title="Voice Input"
                 >
-                  {isListening ? <Mic className="w-4 h-4 text-red-400" /> : <MicOff className="w-4 h-4" />}
+                  {isListening ? <Mic className="w-4 h-4 text-rose-600" /> : <MicOff className="w-4 h-4" />}
                 </button>
                 <input
                   type="text"
                   value={inputPrompt}
                   onChange={(e) => setInputPrompt(e.target.value)}
                   placeholder={t.chatPlaceholder}
-                  className="flex-1 px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-cyan-500 placeholder:text-neutral-500"
+                  className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-emerald-500 shadow-xs placeholder:text-slate-400"
                 />
                 <button 
                   type="submit" 
                   disabled={chatLoading} 
-                  className="p-2.5 bg-cyan-500 hover:bg-cyan-400 text-neutral-950 font-bold rounded-xl transition disabled:opacity-50 cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                  className="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition disabled:opacity-50 cursor-pointer shadow-xs"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -1294,7 +1312,7 @@ export default function HealthCopilotApp() {
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onSuccess={fetchDashboardData}
+        onSuccess={() => fetchDashboardData(sessionUser)}
       />
     </div>
   );

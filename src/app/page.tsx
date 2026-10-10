@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { 
   Activity, UploadCloud, Pill, Calendar, Clock, MessageSquare, 
@@ -23,7 +23,7 @@ const TRANSLATIONS = {
     ingesting: "Analyzing...",
     ingestBtn: "Upload Report",
     cameraBtn: "Take Photo",
-    signInUp: "Sign In / Register",
+    signInUp: "Sign In",
     signOut: "Sign Out",
     verifiedStatus: "Verified",
     menuHeader: "Main Menu",
@@ -31,7 +31,7 @@ const TRANSLATIONS = {
     safeguardDesc: "Responses are strictly validated against your uploaded medical records and prescriptions.",
     abdmBannerTitle: "Ayushman Bharat Digital Mission (ABDM)",
     abdmBannerTag: "Govt. of India",
-    abdmBannerDesc: "Connect your ABHA ID or Aadhaar to securely synchronize and access your official digital health records.",
+    abdmBannerDesc: "Connect your ABHA ID to securely synchronize and access your official digital health records.",
     abdmConnectBtn: "Link ABHA",
     signInRequired: "Please sign in to upload files or access records.",
     nav: {
@@ -54,7 +54,7 @@ const TRANSLATIONS = {
     },
     summariesTitle: "Recent Medical Records",
     fullTimeline: "View Complete History",
-    noDocs: "No clinical records found. Click 'Upload Report' or 'Take Photo' above to add your first record.",
+    noDocs: "No clinical records found. Tap 'Upload Report' or 'Take Photo' above to add your first record.",
     dailyAlarms: "Daily Medicine Alerts",
     armed: "Active",
     noReminders: "No alarms configured. Ask the AI assistant to set reminders for your prescribed medicines.",
@@ -86,22 +86,22 @@ const TRANSLATIONS = {
   te: {
     appTitle: "హెల్త్ కోపైలట్",
     edition: "పేషెంట్ పోర్టల్",
-    telemetryLive: "సిస్టమ్ సిద్ధం",
-    abdmReady: "ABDM / FHIR కనెక్టెడ్",
-    sirenTest: "సౌండ్ టెస్ట్",
+    telemetryLive: "ఆన్‌లైన్",
+    abdmReady: "ABHA సిద్ధం",
+    sirenTest: "టెస్ట్ సౌండ్",
     ingesting: "పరిశీలిస్తోంది...",
-    ingestBtn: "రిపోర్ట్ అప్‌లోడ్",
+    ingestBtn: "అప్‌లోడ్",
     cameraBtn: "ఫోటో తీయండి",
-    signInUp: "లాగిన్ / రిజిస్టర్",
+    signInUp: "లాగిన్",
     signOut: "లాగ్ అవుట్",
     verifiedStatus: "ధృవీకరించబడింది",
     menuHeader: "విభాగాలు",
     groundedSafeguard: "వైద్య భద్రతా రక్షణ",
-    safeguardDesc: "సమాధానాలు కేవలం మీ డాక్టర్ ప్రిస్క్రిప్షన్లు మరియు ల్యాబ్ రిపోర్టుల ఆధారంగా మాత్రమే ఉంటాయి.",
-    abdmBannerTitle: "ఆయుష్మాన్ భారత్ డిజిటల్ మిషన్ (ABDM)",
+    safeguardDesc: "సమాధానాలు కేవలం మీ డాక్టర్ ప్రిస్క్రిప్షన్లు మరియు ల్యాబ్ రిపోర్టుల ఆధారంగా ఉంటాయి.",
+    abdmBannerTitle: "ఆయుష్మాన్ భారత్ (ABDM)",
     abdmBannerTag: "భారత ప్రభుత్వం",
-    abdmBannerDesc: "మీ రికార్డులను సురక్షితంగా సమకాలీకరించడానికి మీ ABHA ID లేదా ఆధార్‌ను అనుసంధానించండి.",
-    abdmConnectBtn: "కనెక్ట్ చేయండి",
+    abdmBannerDesc: "మీ రికార్డులను సురక్షితంగా సమకాలీకరించడానికి ABHA ID ని అనుసంధానించండి.",
+    abdmConnectBtn: "లింక్ చేయండి",
     signInRequired: "రికార్డులను అప్‌లోడ్ చేయడానికి దయచేసి లాగిన్ అవ్వండి.",
     nav: {
       radar: "అవలోకనం",
@@ -136,7 +136,7 @@ const TRANSLATIONS = {
     duration: "ఎన్ని రోజులు",
     trendsHeader: "ల్యాబ్ మార్పుల గ్రాఫ్",
     trendsSub: "కాలక్రమేణా మీ రక్త పరీక్షల ఫలితాలు ఎలా మారాయో చూడండి.",
-    filterPlaceholder: "పరీక్ష పేరు (ఉదా: Vitamin D, Glucose)...",
+    filterPlaceholder: "పరీక్ష పేరు (ఉదా: Vitamin D, Sugar)...",
     needMorePoints: "గ్రాఫ్ చూడటానికి కనీసం 2 వేర్వేరు తేదీల నివేదికలు అవసరం.",
     dossierHeader: "డాక్టర్ సందర్శన పత్రం",
     dossierSub: "డాక్టర్‌ను కలిసే సమయంలో చూపించడానికి సిద్ధం చేసిన నివేదిక.",
@@ -156,20 +156,20 @@ const TRANSLATIONS = {
     appTitle: "हेल्थ कोपायलट",
     edition: "पेशेंट पोर्टल",
     telemetryLive: "सक्रिय",
-    abdmReady: "ABDM / FHIR कनेक्टेड",
+    abdmReady: "ABHA तैयार",
     sirenTest: "अलार्म टेस्ट",
-    ingesting: "विश्लेषण जारी...",
-    ingestBtn: "रिपोर्ट अपलोड करें",
-    cameraBtn: "फोटो लें",
-    signInUp: "साइन इन / रजिस्टर",
+    ingesting: "प्रक्रिया जारी...",
+    ingestBtn: "रिपोर्ट अपलोड",
+    cameraBtn: "फोटो खींचें",
+    signInUp: "साइन इन",
     signOut: "लॉग आउट",
     verifiedStatus: "सत्यापित",
     menuHeader: "मुख्य मेनू",
     groundedSafeguard: "सत्यापित सुरक्षा",
     safeguardDesc: "सभी उत्तर केवल आपकी अपलोड की गई रिपोर्ट और पर्चियों पर आधारित हैं।",
-    abdmBannerTitle: "आयुष्मान भारत डिजिटल मिशन (ABDM)",
+    abdmBannerTitle: "आयुष्मान भारत (ABDM)",
     abdmBannerTag: "भारत सरकार",
-    abdmBannerDesc: "अपने मेडिकल रिकॉर्ड सुरक्षित रूप से सिंक करने के लिए अपना ABHA ID या आधार लिंक करें।",
+    abdmBannerDesc: "अपने मेडिकल रिकॉर्ड सुरक्षित रूप से सिंक करने के लिए ABHA लिंक करें।",
     abdmConnectBtn: "लिंक करें",
     signInRequired: "मेडिकल रिकॉर्ड अपलोड करने के लिए कृपया पहले साइन इन करें।",
     nav: {
@@ -192,7 +192,7 @@ const TRANSLATIONS = {
     },
     summariesTitle: "हालिया रिपोर्ट सारांश",
     fullTimeline: "पूरा इतिहास देखें",
-    noDocs: "कोई रिकॉर्ड उपलब्ध नहीं है। रिपोर्ट अपलोड करने के लिए ऊपर दिए गए बटन पर क्लिक करें।",
+    noDocs: "कोई रिकॉर्ड उपलब्ध नहीं है। रिपोर्ट अपलोड करने के लिए ऊपर दिए गए बटन पर टैप करें।",
     dailyAlarms: "दवा रिमाइंडर",
     armed: "सक्रिय",
     noReminders: "कोई अलार्म सक्रिय नहीं है। चैट में अलार्म सेट करने के लिए कहें।",
@@ -265,12 +265,41 @@ export default function HealthCopilotApp() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
+  const fetchDashboardData = useCallback(async (userParam?: any) => {
+    const targetUser = userParam || sessionUser;
+
+    if (!targetUser?.id) {
+      setDocuments([]);
+      setMedications([]);
+      setReminders([]);
+      setBiomarkers([]);
+      return;
+    }
+
+    try {
+      const [docsRes, medsRes, remsRes, bioRes] = await Promise.all([
+        supabase.from("documents").select("*").eq("user_id", targetUser.id).order("record_date", { ascending: false }),
+        supabase.from("medications").select("*").eq("user_id", targetUser.id),
+        supabase.from("reminders").select("*").eq("user_id", targetUser.id).order("time", { ascending: true }),
+        supabase.from("biomarkers").select("*").eq("user_id", targetUser.id).order("test_date", { ascending: true })
+      ]);
+
+      setDocuments(docsRes.data || []);
+      setMedications(medsRes.data || []);
+      setReminders(remsRes.data || []);
+      setBiomarkers(bioRes.data || []);
+    } catch (err) {
+      console.error("Data load error:", err);
+    }
+  }, [sessionUser]);
+
   useEffect(() => {
     if (chatMessages.length === 1 && chatMessages[0].role === "copilot") {
       setChatMessages([{ role: "copilot", text: t.welcomeChat }]);
     }
   }, [selectedLang]);
 
+  // Auth setup and auto-rehydration
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
@@ -307,7 +336,14 @@ export default function HealthCopilotApp() {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchDashboardData]);
+
+  // Refetch latest state on tab switch to keep Overview & Reminders in sync
+  useEffect(() => {
+    if (sessionUser?.id) {
+      fetchDashboardData(sessionUser);
+    }
+  }, [activeTab, sessionUser, fetchDashboardData]);
 
   const loadUserProfile = async (user: any) => {
     try {
@@ -324,7 +360,7 @@ export default function HealthCopilotApp() {
         });
       }
     } catch (e) {
-      console.error("Error loading profile:", e);
+      console.error("Profile load error:", e);
     }
   };
 
@@ -364,6 +400,7 @@ export default function HealthCopilotApp() {
     }
   };
 
+  // Medicine reminder ticking loop
   useEffect(() => {
     const interval = setInterval(() => {
       if (!reminders || reminders.length === 0) return;
@@ -397,7 +434,7 @@ export default function HealthCopilotApp() {
           playAlarmSound();
 
           if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-            new Notification(`Prescription Reminder: ${r.title}`, {
+            new Notification(`Medicine Reminder: ${r.title}`, {
               body: `Scheduled time: ${r.time}.`,
               icon: "/favicon.ico"
             });
@@ -408,50 +445,6 @@ export default function HealthCopilotApp() {
 
     return () => clearInterval(interval);
   }, [reminders]);
-
-  const fetchDashboardData = async (userParam?: any) => {
-    const targetUser = userParam || sessionUser;
-
-    if (!targetUser?.id) {
-      setDocuments([]);
-      setMedications([]);
-      setReminders([]);
-      setBiomarkers([]);
-      return;
-    }
-
-    try {
-      const { data: docs } = await supabase
-        .from("documents")
-        .select("*")
-        .eq("user_id", targetUser.id)
-        .order("record_date", { ascending: false });
-
-      const { data: meds } = await supabase
-        .from("medications")
-        .select("*")
-        .eq("user_id", targetUser.id);
-
-      const { data: rems } = await supabase
-        .from("reminders")
-        .select("*")
-        .eq("user_id", targetUser.id)
-        .order("time", { ascending: true });
-
-      const { data: bio } = await supabase
-        .from("biomarkers")
-        .select("*")
-        .eq("user_id", targetUser.id)
-        .order("test_date", { ascending: true });
-
-      setDocuments(docs || []);
-      setMedications(meds || []);
-      setReminders(rems || []);
-      setBiomarkers(bio || []);
-    } catch (err) {
-      console.error("Data load error:", err);
-    }
-  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -609,7 +602,11 @@ export default function HealthCopilotApp() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userText, language: selectedLang, userId: sessionUser?.id }),
+        body: JSON.stringify({ 
+          message: userText, 
+          language: selectedLang, 
+          userId: sessionUser?.id 
+        }),
       });
       const data = await res.json();
 
@@ -622,7 +619,10 @@ export default function HealthCopilotApp() {
         ]);
       }
 
-      if (data.actionTaken) fetchDashboardData(sessionUser);
+      // Re-fetch all telemetry if an action (like setting a reminder) was executed
+      if (data.actionTaken && sessionUser) {
+        await fetchDashboardData(sessionUser);
+      }
     } catch (err: any) {
       setChatMessages(prev => [...prev, { role: "copilot", text: "Connection error: " + err.message }]);
     } finally {
@@ -634,7 +634,7 @@ export default function HealthCopilotApp() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert("Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+      alert("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
       return;
     }
 
@@ -686,54 +686,56 @@ export default function HealthCopilotApp() {
     .map(b => ({ date: b.test_date, value: Number(b.value) }));
 
   const navItems = [
-    { id: "overview", label: t.nav.radar, icon: Activity, badge: `${documents.length}` },
-    { id: "timeline", label: t.nav.ledger, icon: Calendar, badge: `${documents.length}` },
-    { id: "medications", label: t.nav.regimens, icon: Pill, badge: `${medications.filter(m => m.status === "active").length}` },
-    { id: "trends", label: t.nav.trends, icon: TrendingUp, badge: "Charts" },
-    { id: "doctor-prep", label: t.nav.dossier, icon: Printer, badge: "Brief" },
-    { id: "chat", label: t.nav.agent, icon: MessageSquare, badge: "AI" },
+    { id: "overview", label: t.nav.radar, icon: Activity, count: documents.length },
+    { id: "timeline", label: t.nav.ledger, icon: Calendar, count: documents.length },
+    { id: "medications", label: t.nav.regimens, icon: Pill, count: medications.filter(m => m.status === "active").length },
+    { id: "trends", label: t.nav.trends, icon: TrendingUp },
+    { id: "doctor-prep", label: t.nav.dossier, icon: Printer },
+    { id: "chat", label: t.nav.agent, icon: MessageSquare },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900 antialiased pb-12">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900 antialiased pb-24 md:pb-8">
       {/* Adherence Alert Banner */}
       {activeAlarm && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-white border border-amber-300 text-slate-800 px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-4 animate-in fade-in">
-          <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-600">
-            <BellRing className="w-4 h-4 animate-bounce" />
-          </div>
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Medicine Alert</div>
-            <div className="text-xs font-semibold text-slate-800">{activeAlarm.title} &bull; <span className="text-amber-700 font-bold">{activeAlarm.time}</span></div>
+        <div className="fixed top-4 inset-x-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-50 bg-white border border-amber-300 text-slate-800 p-3.5 rounded-2xl shadow-xl flex items-center justify-between space-x-3">
+          <div className="flex items-center space-x-3 truncate">
+            <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+              <BellRing className="w-4 h-4 animate-bounce" />
+            </div>
+            <div className="truncate">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Reminder</div>
+              <div className="text-xs font-semibold text-slate-900 truncate">{activeAlarm.title}</div>
+            </div>
           </div>
           <button
             onClick={() => {
               toggleReminder(activeAlarm.id, false);
               setActiveAlarm(null);
             }}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm cursor-pointer"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 cursor-pointer"
           >
-            I took it
+            Done
           </button>
         </div>
       )}
 
-      {/* Clean White Top Navigation Header */}
-      <header className="h-16 px-6 sm:px-8 border-b border-slate-200 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-40 shadow-xs">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
-            <Heart className="w-5 h-5 fill-current" />
+      {/* Responsive Top Bar */}
+      <header className="h-16 px-4 sm:px-6 border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between shadow-xs">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
+            <Heart className="w-4 h-4 fill-current" />
           </div>
           <div>
-            <div className="flex items-center space-x-2">
-              <span className="font-extrabold text-base tracking-tight text-slate-900">{t.appTitle}</span>
-              <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <div className="flex items-center space-x-1.5">
+              <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900">{t.appTitle}</span>
+              <span className="hidden sm:inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                 {t.edition}
               </span>
             </div>
-            <div className="flex items-center space-x-2 text-[11px] text-slate-500">
+            <div className="flex items-center space-x-1.5 text-[10px] text-slate-500 font-medium">
               <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> {t.telemetryLive}
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span> {t.telemetryLive}
               </span>
               <span>&bull;</span>
               <span>{t.abdmReady}</span>
@@ -741,30 +743,31 @@ export default function HealthCopilotApp() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        {/* Action Controls */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2">
           {/* Language Switcher */}
           <div className="flex bg-slate-100 border border-slate-200 rounded-lg p-0.5 text-xs font-medium">
             <button 
               onClick={() => setSelectedLang("en")} 
-              className={`px-2.5 py-1 rounded-md transition cursor-pointer ${selectedLang === "en" ? "bg-white text-emerald-800 font-bold shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${selectedLang === "en" ? "bg-white text-emerald-800 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
             >
               EN
             </button>
             <button 
               onClick={() => setSelectedLang("te")} 
-              className={`px-2.5 py-1 rounded-md transition cursor-pointer ${selectedLang === "te" ? "bg-white text-emerald-800 font-bold shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${selectedLang === "te" ? "bg-white text-emerald-800 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
             >
-              తెలుగు
+              తె
             </button>
             <button 
               onClick={() => setSelectedLang("hi")} 
-              className={`px-2.5 py-1 rounded-md transition cursor-pointer ${selectedLang === "hi" ? "bg-white text-emerald-800 font-bold shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${selectedLang === "hi" ? "bg-white text-emerald-800 shadow-xs" : "text-slate-600 hover:text-slate-900"}`}
             >
-              हिन्दी
+              हि
             </button>
           </div>
 
-          {/* ABHA Gateway */}
+          {/* ABHA FHIR Trigger */}
           <button
             onClick={() => setShowAbhaModal(true)}
             className="hidden sm:flex items-center space-x-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition cursor-pointer"
@@ -773,25 +776,16 @@ export default function HealthCopilotApp() {
             <span>ABHA & FHIR</span>
           </button>
 
-          <button 
-            onClick={playAlarmSound}
-            className="flex items-center space-x-1.5 text-xs text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 transition cursor-pointer"
-            title="Test alert notification chime"
-          >
-            <Bell className="w-3.5 h-3.5 text-slate-500" />
-            <span className="hidden md:inline">{t.sirenTest}</span>
-          </button>
-
-          {/* Camera Scan Action */}
+          {/* Camera Button */}
           <button
             type="button"
             onClick={handleCameraClick}
             disabled={uploading}
-            className="flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition disabled:opacity-50"
-            title="Snap prescription photo"
+            className="flex items-center justify-center w-8 h-8 sm:w-auto sm:px-2.5 sm:h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-semibold transition cursor-pointer disabled:opacity-50"
+            title="Scan with Camera"
           >
             <Camera className="w-4 h-4 text-emerald-600" />
-            <span className="hidden md:inline">{uploading ? "..." : t.cameraBtn}</span>
+            <span className="hidden md:inline ml-1.5">{t.cameraBtn}</span>
           </button>
           <input 
             ref={cameraInputRef}
@@ -803,15 +797,15 @@ export default function HealthCopilotApp() {
             className="hidden" 
           />
 
-          {/* Primary Upload Button */}
+          {/* Upload Button */}
           <button
             type="button"
             onClick={handleUploadClick}
             disabled={uploading}
-            className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs cursor-pointer transition shadow-xs disabled:opacity-50"
+            className="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs shadow-xs transition cursor-pointer disabled:opacity-50"
           >
             <UploadCloud className="w-4 h-4" />
-            <span>{uploading ? t.ingesting : t.ingestBtn}</span>
+            <span className="text-[11px] sm:text-xs">{uploading ? "..." : t.ingestBtn}</span>
           </button>
           <input 
             ref={fileInputRef}
@@ -822,25 +816,23 @@ export default function HealthCopilotApp() {
             className="hidden" 
           />
 
-          <div className="h-6 w-px bg-slate-200 mx-1" />
-
-          {/* User Status Profile */}
+          {/* User Sign In / Profile */}
           {sessionUser ? (
-            <div className="flex items-center space-x-2.5 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg">
-              <div className="w-7 h-7 rounded-md bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">
+            <div className="flex items-center space-x-2 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg">
+              <div className="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[11px] font-bold">
                 {profile?.name ? profile.name[0].toUpperCase() : sessionUser.email[0].toUpperCase()}
               </div>
-              <div className="text-left hidden sm:block">
-                <div className="text-xs font-semibold text-slate-800 leading-tight truncate max-w-[110px]">
+              <div className="hidden lg:block text-left">
+                <div className="text-xs font-semibold text-slate-800 leading-tight truncate max-w-[100px]">
                   {profile?.name || sessionUser.email}
                 </div>
-                <div className="text-[10px] text-emerald-700 font-medium">
+                <div className="text-[9px] text-emerald-700 font-medium">
                   {profile?.blood_group ? `Type ${profile.blood_group}` : t.verifiedStatus}
                 </div>
               </div>
               <button
                 onClick={handleSignOut}
-                className="p-1 rounded-md hover:bg-slate-200 text-slate-500 hover:text-rose-600 transition cursor-pointer"
+                className="p-1 rounded hover:bg-slate-200 text-slate-500 hover:text-rose-600 transition cursor-pointer"
                 title={t.signOut}
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -849,19 +841,19 @@ export default function HealthCopilotApp() {
           ) : (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="flex items-center space-x-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-semibold px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
+              className="flex items-center space-x-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-semibold px-2.5 py-1.5 rounded-lg text-xs transition cursor-pointer"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>{t.signInUp}</span>
+              <span className="hidden sm:inline">{t.signInUp}</span>
             </button>
           )}
         </div>
       </header>
 
-      {/* Main Workspace Frame */}
+      {/* Main Framework */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Navigation Sidebar */}
-        <aside className="w-64 border-r border-slate-200 bg-white p-4 flex flex-col justify-between shrink-0 shadow-xs">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:flex w-60 border-r border-slate-200 bg-white p-4 flex-col justify-between shrink-0 shadow-xs">
           <nav className="space-y-1">
             <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">{t.menuHeader}</div>
             {navItems.map(item => {
@@ -881,11 +873,13 @@ export default function HealthCopilotApp() {
                     <Icon className={`w-4 h-4 ${active ? "text-emerald-700" : "text-slate-400"}`} />
                     <span>{item.label}</span>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                    active ? "bg-emerald-200/60 text-emerald-900 border-emerald-300" : "bg-slate-100 text-slate-500 border-slate-200"
-                  }`}>
-                    {item.badge}
-                  </span>
+                  {item.count !== undefined && (
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                      active ? "bg-emerald-200/60 text-emerald-900 border-emerald-300" : "bg-slate-100 text-slate-500 border-slate-200"
+                    }`}>
+                      {item.count}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -902,13 +896,13 @@ export default function HealthCopilotApp() {
           </div>
         </aside>
 
-        {/* Dynamic Canvas Area */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
-          {/* TAB 1: HEALTH OVERVIEW */}
+        {/* Dynamic Workspace */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full max-w-5xl mx-auto">
+          {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
-            <div className="space-y-6">
-              {/* Telemetry Metric Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-4 sm:space-y-6">
+              {/* Telemetry Cards: 2x2 on mobile, 4 columns on desktop */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
                   { label: t.metrics.docs, val: documents.length, desc: t.metrics.docsDesc, icon: FileText },
                   { label: t.metrics.regimens, val: medications.filter(m => m.status === "active").length, desc: t.metrics.regimensDesc, icon: Pill },
@@ -917,58 +911,56 @@ export default function HealthCopilotApp() {
                 ].map((c, i) => {
                   const Icon = c.icon;
                   return (
-                    <div key={i} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+                    <div key={i} className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
                       <div className="flex justify-between items-start">
                         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{c.label}</span>
-                        <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-50 text-emerald-700">
                           <Icon className="w-4 h-4" />
                         </div>
                       </div>
-                      <div className="mt-3">
-                        <div className="text-3xl font-extrabold text-slate-900 tracking-tight">{c.val}</div>
-                        <div className="text-xs text-slate-500 mt-1">{c.desc}</div>
+                      <div className="mt-2 sm:mt-3">
+                        <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">{c.val}</div>
+                        <div className="text-[11px] sm:text-xs text-slate-500 mt-0.5 truncate">{c.desc}</div>
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              {/* ABDM Banner Card */}
+              {/* ABDM Link Banner */}
               <div 
                 onClick={() => setShowAbhaModal(true)}
-                className="p-5 rounded-2xl bg-white border border-emerald-200 hover:border-emerald-300 transition cursor-pointer flex items-center justify-between shadow-xs group"
+                className="p-4 sm:p-5 rounded-2xl bg-white border border-emerald-200 hover:border-emerald-300 transition cursor-pointer flex items-center justify-between shadow-xs"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-                    <Building2 className="w-6 h-6" />
+                <div className="flex items-center space-x-3 sm:space-x-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
-                      <h4 className="text-sm font-bold text-slate-900">
-                        {t.abdmBannerTitle}
-                      </h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900">{t.abdmBannerTitle}</h4>
+                      <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                         {t.abdmBannerTag}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5 line-clamp-1 sm:line-clamp-none">
                       {t.abdmBannerDesc}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-1.5 text-emerald-700 text-xs font-bold pl-4 shrink-0">
-                  <span>{t.abdmConnectBtn}</span>
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
+                <div className="flex items-center space-x-1 text-emerald-700 text-xs font-bold pl-2 shrink-0">
+                  <span className="hidden sm:inline">{t.abdmConnectBtn}</span>
+                  <ChevronRight className="w-4 h-4" />
                 </div>
               </div>
 
-              {/* Summaries & Reminders Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 rounded-2xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
+              {/* Clinical Summaries & Daily Alarms */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="lg:col-span-2 rounded-2xl bg-white border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3.5">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div className="flex items-center space-x-2">
                       <Sparkles className="w-4 h-4 text-emerald-600" />
-                      <h3 className="font-bold text-base text-slate-900">{t.summariesTitle}</h3>
+                      <h3 className="font-bold text-sm sm:text-base text-slate-900">{t.summariesTitle}</h3>
                     </div>
                     <button onClick={() => setActiveTab("timeline")} className="text-xs text-emerald-700 hover:text-emerald-800 font-bold flex items-center space-x-1 cursor-pointer">
                       <span>{t.fullTimeline}</span>
@@ -977,33 +969,24 @@ export default function HealthCopilotApp() {
                   </div>
 
                   {documents.length === 0 ? (
-                    <div className="p-8 text-center text-slate-500 border border-dashed border-slate-200 rounded-xl text-xs">
+                    <div className="p-6 sm:p-8 text-center text-slate-500 border border-dashed border-slate-200 rounded-xl text-xs">
                       {t.noDocs}
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {documents.slice(0, 3).map((doc, idx) => (
-                        <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-300 transition space-y-2">
+                        <div key={idx} className="p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                           <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center space-x-2">
-                              <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200">
-                                {doc.doc_type}
-                              </span>
-                              <span className="text-slate-500 text-[11px] font-medium">
-                                {doc.record_date}
-                              </span>
-                            </div>
-                            {doc.doctor_name && (
-                              <span className="text-slate-600 font-medium text-[11px] truncate max-w-[180px]">
-                                {doc.doctor_name}
-                              </span>
-                            )}
+                            <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded border border-emerald-200">
+                              {doc.doc_type}
+                            </span>
+                            <span className="text-slate-500 text-[11px]">{doc.record_date}</span>
                           </div>
                           <p className="text-xs text-slate-700 leading-relaxed">
                             {doc.plain_summary}
                           </p>
                           {doc.questions && doc.questions.length > 0 && (
-                            <div className="pt-2 border-t border-slate-200/60 text-[11px] text-emerald-800 flex items-center space-x-1.5">
+                            <div className="pt-2 border-t border-slate-200 text-[11px] text-emerald-800 flex items-center space-x-1.5">
                               <span className="font-bold text-[10px] uppercase text-emerald-700">Question:</span>
                               <span className="truncate">{doc.questions[0]}</span>
                             </div>
@@ -1014,18 +997,18 @@ export default function HealthCopilotApp() {
                   )}
                 </div>
 
-                {/* Daily Reminders */}
-                <div className="rounded-2xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
+                {/* Daily Alerts List */}
+                <div className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3.5">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div className="flex items-center space-x-2">
                       <Clock className="w-4 h-4 text-emerald-600" />
-                      <h3 className="font-bold text-base text-slate-900">{t.dailyAlarms}</h3>
+                      <h3 className="font-bold text-sm sm:text-base text-slate-900">{t.dailyAlarms}</h3>
                     </div>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">{t.armed}</span>
                   </div>
 
                   {reminders.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl">
+                    <div className="p-6 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl">
                       {t.noReminders}
                     </div>
                   ) : (
@@ -1045,11 +1028,11 @@ export default function HealthCopilotApp() {
                               <Bell className="w-3.5 h-3.5" />
                             </div>
                             <div>
-                              <p className="font-semibold text-slate-900">{r.title}</p>
-                              <span className="text-[11px] text-slate-500">{r.time}</span>
+                              <p className="font-semibold text-slate-900 leading-tight">{r.title}</p>
+                              <span className="text-[10px] text-slate-500">{r.time}</span>
                             </div>
                           </div>
-                          <CheckCircle2 className={`w-4 h-4 ${r.completed ? "text-emerald-600" : "text-slate-300 hover:text-slate-400"}`} />
+                          <CheckCircle2 className={`w-4 h-4 ${r.completed ? "text-emerald-600" : "text-slate-300"}`} />
                         </div>
                       ))}
                     </div>
@@ -1059,31 +1042,31 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 2: MEDICAL HISTORY */}
+          {/* TAB 2: TIMELINE */}
           {activeTab === "timeline" && (
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="space-y-4">
               <div>
-                <h2 className="text-xl font-extrabold text-slate-900">{t.timelineHeader}</h2>
-                <p className="text-xs text-slate-500 mt-1">{t.timelineSub}</p>
+                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">{t.timelineHeader}</h2>
+                <p className="text-xs text-slate-500">{t.timelineSub}</p>
               </div>
 
               {documents.length === 0 ? (
-                <div className="p-10 text-center text-slate-500 border border-dashed border-slate-200 rounded-2xl text-xs bg-white">
+                <div className="p-8 text-center text-slate-500 border border-dashed border-slate-200 rounded-2xl text-xs bg-white">
                   {t.noDocs}
                 </div>
               ) : (
-                <div className="relative border-l-2 border-emerald-200 ml-4 pl-6 space-y-6">
+                <div className="relative border-l-2 border-emerald-200 ml-3 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
                   {documents.map((doc, i) => (
                     <div key={i} className="relative">
-                      <div className="absolute -left-[31px] top-2 w-3.5 h-3.5 rounded-full bg-emerald-600 border-4 border-white shadow-xs" />
-                      <div className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-emerald-300 shadow-xs transition space-y-2">
+                      <div className="absolute -left-[23px] sm:-left-[31px] top-2 w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full bg-emerald-600 border-2 sm:border-4 border-white shadow-xs" />
+                      <div className="p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                             {doc.doc_type}
                           </span>
-                          <span className="text-slate-500 text-[11px] font-medium">{doc.record_date}</span>
+                          <span className="text-slate-500 text-[11px]">{doc.record_date}</span>
                         </div>
-                        <h4 className="font-bold text-sm text-slate-900">{doc.doctor_name || "Diagnostic Finding"}</h4>
+                        <h4 className="font-bold text-xs sm:text-sm text-slate-900">{doc.doctor_name || "Diagnostic Finding"}</h4>
                         <p className="text-xs text-slate-600 leading-relaxed">{doc.plain_summary}</p>
                       </div>
                     </div>
@@ -1093,25 +1076,25 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 3: ACTIVE MEDICINES */}
+          {/* TAB 3: MEDICINES */}
           {activeTab === "medications" && (
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="space-y-4">
               <div>
-                <h2 className="text-xl font-extrabold text-slate-900">{t.regimensHeader}</h2>
-                <p className="text-xs text-slate-500 mt-1">{t.regimensSub}</p>
+                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">{t.regimensHeader}</h2>
+                <p className="text-xs text-slate-500">{t.regimensSub}</p>
               </div>
 
               {medications.length === 0 ? (
-                <div className="p-10 text-center text-slate-500 border border-dashed border-slate-200 rounded-2xl text-xs bg-white">
-                  No active medicines recorded yet. Upload a prescription to automatically extract your medicines.
+                <div className="p-8 text-center text-slate-500 border border-dashed border-slate-200 rounded-2xl text-xs bg-white">
+                  No active medicines recorded yet.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {medications.map((m, idx) => (
-                    <div key={idx} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                    <div key={idx} className="p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-sm text-slate-900">{m.name}</span>
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                           {m.status}
                         </span>
                       </div>
@@ -1127,31 +1110,31 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 4: LAB TEST TRENDS */}
+          {/* TAB 4: TRENDS */}
           {activeTab === "trends" && (
-            <div className="max-w-4xl mx-auto space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h2 className="text-xl font-extrabold text-slate-900">{t.trendsHeader}</h2>
-                  <p className="text-xs text-slate-500 mt-1">{t.trendsSub}</p>
+                  <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">{t.trendsHeader}</h2>
+                  <p className="text-xs text-slate-500">{t.trendsSub}</p>
                 </div>
                 <input 
                   type="text" 
                   value={selectedMarker} 
                   onChange={(e) => setSelectedMarker(e.target.value)} 
                   placeholder={t.filterPlaceholder}
-                  className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-emerald-500 shadow-xs"
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-emerald-500 shadow-xs w-full sm:w-auto"
                 />
               </div>
 
-              <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <h3 className="text-sm font-bold text-slate-900 uppercase">{selectedMarker} Progression</h3>
+              <div className="p-4 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 uppercase">{selectedMarker} Progression</h3>
                   <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Chart</span>
                 </div>
 
                 {trendData.length > 1 ? (
-                  <div className="h-72 w-full pt-4">
+                  <div className="h-64 sm:h-72 w-full pt-2">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={trendData}>
                         <defs>
@@ -1160,17 +1143,15 @@ export default function HealthCopilotApp() {
                             <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} />
-                        <YAxis stroke="#94a3b8" fontSize={11} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-                        />
-                        <Area type="monotone" dataKey="value" stroke="#059669" strokeWidth={2.5} fillOpacity={1} fill="url(#emeraldGrad)" />
+                        <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} />
+                        <YAxis stroke="#94a3b8" fontSize={10} />
+                        <Tooltip contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
+                        <Area type="monotone" dataKey="value" stroke="#059669" strokeWidth={2} fillOpacity={1} fill="url(#emeraldGrad)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="p-12 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl">
+                  <div className="p-8 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl">
                     {t.needMorePoints}
                   </div>
                 )}
@@ -1180,40 +1161,40 @@ export default function HealthCopilotApp() {
 
           {/* TAB 5: DOCTOR SUMMARY */}
           {activeTab === "doctor-prep" && (
-            <div className="max-w-3xl mx-auto rounded-2xl bg-white border border-slate-200 p-8 shadow-xs space-y-6">
-              <div className="flex justify-between items-start border-b border-slate-100 pb-5">
+            <div className="max-w-2xl mx-auto rounded-2xl bg-white border border-slate-200 p-5 sm:p-8 shadow-xs space-y-5">
+              <div className="flex justify-between items-start border-b border-slate-100 pb-4">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-slate-900">{t.dossierHeader}</h2>
-                  <p className="text-xs text-slate-500 mt-1">{t.dossierSub}</p>
+                  <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">{t.dossierHeader}</h2>
+                  <p className="text-xs text-slate-500">{t.dossierSub}</p>
                 </div>
-                <button onClick={() => window.print()} className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs">
-                  <Printer className="w-4 h-4" />
+                <button onClick={() => window.print()} className="flex items-center space-x-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-xs cursor-pointer">
+                  <Printer className="w-3.5 h-3.5" />
                   <span>{t.printBrief}</span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 bg-slate-50 border border-slate-200 p-4 rounded-xl text-xs">
-                <div><span className="text-slate-500">{t.patient}:</span> <strong className="text-slate-900">{profile?.name || "Not signed in"}</strong></div>
-                <div><span className="text-slate-500">{t.age}:</span> <strong className="text-slate-900">{profile?.age || "--"}</strong></div>
-                <div><span className="text-slate-500">{t.bloodGroup}:</span> <strong className="text-slate-900">{profile?.blood_group || "--"}</strong></div>
-                <div><span className="text-slate-500">{t.allergies}:</span> <strong className="text-slate-900">{profile?.allergies?.join(", ") || "None"}</strong></div>
+              <div className="grid grid-cols-2 gap-3 bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-xs">
+                <div><span className="text-slate-500">{t.patient}:</span> <strong className="text-slate-900 block truncate">{profile?.name || "Patient"}</strong></div>
+                <div><span className="text-slate-500">{t.age}:</span> <strong className="text-slate-900 block">{profile?.age || "--"}</strong></div>
+                <div><span className="text-slate-500">{t.bloodGroup}:</span> <strong className="text-slate-900 block">{profile?.blood_group || "--"}</strong></div>
+                <div><span className="text-slate-500">{t.allergies}:</span> <strong className="text-slate-900 block truncate">{profile?.allergies?.join(", ") || "None"}</strong></div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">{t.currentRegimens}</h4>
                 {medications.length === 0 ? (
-                  <p className="text-xs text-slate-500">No active medications registered.</p>
+                  <p className="text-xs text-slate-500">No active medicines.</p>
                 ) : (
                   <ul className="list-disc pl-5 text-xs space-y-1 text-slate-700">
                     {medications.map((m, i) => (
-                      <li key={i}>{m.name} — {m.dosage} ({m.frequency})</li>
+                      <li key={i}>{m.name} &mdash; {m.dosage}</li>
                     ))}
                   </ul>
                 )}
               </div>
 
-              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800">{t.suggestedQuestions}</h4>
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase text-emerald-800">{t.suggestedQuestions}</h4>
                 <ul className="list-disc pl-5 text-xs text-slate-700 space-y-1">
                   {documents[0]?.questions?.map((q: string, i: number) => <li key={i}>{q}</li>) || (
                     <li>Inquire about the duration and tapering of active therapies.</li>
@@ -1223,30 +1204,30 @@ export default function HealthCopilotApp() {
             </div>
           )}
 
-          {/* TAB 6: AI CLINICAL COPILOT */}
+          {/* TAB 6: AI ASSISTANT CHAT */}
           {activeTab === "chat" && (
-            <div className="max-w-3xl mx-auto h-[calc(100vh-140px)] flex flex-col rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-xs">
-              <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+            <div className="h-[calc(100vh-175px)] md:h-[calc(100vh-140px)] flex flex-col rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-xs">
+              <div className="p-3 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center space-x-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                   <span className="font-bold text-xs text-slate-900">{t.agentTitle}</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
                   {selectedLang === "te" ? "తెలుగు" : selectedLang === "hi" ? "हिन्दी" : "English"}
                 </span>
               </div>
 
-              <div className="flex-1 p-5 overflow-y-auto space-y-3.5">
+              <div className="flex-1 p-3.5 sm:p-5 overflow-y-auto space-y-3">
                 {chatMessages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] p-3.5 rounded-2xl text-xs leading-relaxed ${
+                    <div className={`max-w-[85%] sm:max-w-[80%] p-3 rounded-2xl text-xs leading-relaxed ${
                       msg.role === "user" 
                         ? "bg-emerald-600 text-white rounded-br-none shadow-xs" 
                         : "bg-slate-100 border border-slate-200 text-slate-800 rounded-bl-none"
                     }`}>
                       {msg.action && (
                         <div className="text-[10px] font-bold text-emerald-800 mb-1">
-                          [Action: {msg.action}]
+                          [{msg.action}]
                         </div>
                       )}
                       <div className="whitespace-pre-wrap">{msg.text}</div>
@@ -1255,7 +1236,7 @@ export default function HealthCopilotApp() {
                 ))}
                 {chatLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-slate-100 border border-slate-200 p-3 rounded-2xl text-xs text-slate-500 flex items-center space-x-2">
+                    <div className="bg-slate-100 border border-slate-200 p-2.5 rounded-xl text-xs text-slate-500 flex items-center space-x-2">
                       <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600" />
                       <span>{t.formulating}</span>
                     </div>
@@ -1263,12 +1244,12 @@ export default function HealthCopilotApp() {
                 )}
               </div>
 
-              <form onSubmit={handleSendMessage} className="p-3.5 border-t border-slate-100 flex items-center space-x-2 bg-slate-50">
+              <form onSubmit={handleSendMessage} className="p-2.5 sm:p-3.5 border-t border-slate-100 flex items-center space-x-2 bg-slate-50">
                 <button
                   type="button"
                   onClick={toggleVoiceInput}
-                  className={`p-2.5 rounded-xl border transition cursor-pointer ${
-                    isListening ? "bg-rose-50 text-rose-600 border-rose-300 animate-pulse" : "text-slate-500 hover:text-slate-800 border-slate-200 hover:bg-slate-200"
+                  className={`p-2 rounded-xl border transition cursor-pointer ${
+                    isListening ? "bg-rose-50 text-rose-600 border-rose-300 animate-pulse" : "text-slate-500 hover:text-slate-800 border-slate-200 bg-white"
                   }`}
                   title="Voice Input"
                 >
@@ -1279,12 +1260,12 @@ export default function HealthCopilotApp() {
                   value={inputPrompt}
                   onChange={(e) => setInputPrompt(e.target.value)}
                   placeholder={t.chatPlaceholder}
-                  className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-emerald-500 shadow-xs placeholder:text-slate-400"
+                  className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-emerald-500 shadow-xs placeholder:text-slate-400"
                 />
                 <button 
                   type="submit" 
                   disabled={chatLoading} 
-                  className="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition disabled:opacity-50 cursor-pointer shadow-xs"
+                  className="p-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-xs transition cursor-pointer disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -1293,6 +1274,35 @@ export default function HealthCopilotApp() {
           )}
         </main>
       </div>
+
+      {/* Ergonomic Mobile Bottom App Bar */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-50 px-2 py-1.5 flex items-center justify-around shadow-lg">
+        {navItems.map(item => {
+          const Icon = item.icon;
+          const active = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id as any)}
+              className={`flex flex-col items-center justify-center flex-1 py-1 px-1 transition relative cursor-pointer ${
+                active ? "text-emerald-700 font-bold" : "text-slate-400 hover:text-slate-600 font-medium"
+              }`}
+            >
+              <div className="relative">
+                <Icon className={`w-5 h-5 ${active ? "text-emerald-600 stroke-[2.5]" : "stroke-2"}`} />
+                {item.count !== undefined && item.count > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-emerald-600 text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
+                    {item.count}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-[56px] text-center">
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
 
       <ConfirmModal 
         isOpen={showConfirmModal}
